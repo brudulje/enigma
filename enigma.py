@@ -43,11 +43,11 @@ def main():
     reglene for enigma. Hvis vi skal få sjekket skikkelig må vi skrive enda \
     litt til, kanskje helt ut hit."
 #    message = "F Q 2143 = 14 = FGH ZAS\nDQLOP NWSSD LFBB"
-    message = "F Q 1230  = 250 = WZA UHL FDJKM LDAHH YEOEF PTWYB LENDP MKOXL \
-        DFAMU DWIJD XRJZY DFRIO MFTEV KTGUY DDZED TPOQX FDRIU CCBFM MQWYE \
-        FIPUL WSXHG YHJZE AOFDU FUTEC VVBDP OLZLG DEJTI HGYER DCXCV BHSEE \
-        TTKJK XAAQU GTTUO FCXZH IDREF TGHSZ DERFG EDZZS ERDET RFGTT RREOM \
-        MJMED EDDER FTGRE UUHKD DLEFG FGREZ ZZSEU YYRGD EDFED HJUIK FXNVB"
+    message = "F Q 1230  = 250 = WZA UHL FDJKM LDAHH YEOEF PTWYB LENDP MKOXL "\
+        + "DFAMU DWIJD XRJZY DFRIO MFTEV KTGUY DDZED TPOQX FDRIU CCBFM MQWYE "\
+        + "FIPUL WSXHG YHJZE AOFDU FUTEC VVBDP OLZLG DEJTI HGYER DCXCV BHSEE "\
+        + "TTKJK XAAQU GTTUO FCXZH IDREF TGHSZ DERFG EDZZS ERDET RFGTT RREOM "\
+        + "MJMED EDDER FTGRE UUHKD DLEFG FGREZ ZZSEU YYRGD EDFED HJUIK FXNVB"\
 
     enig_op(message, recipient=to, sender=sender, encipher=True, month=None)
 
@@ -73,9 +73,9 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
     if encipher:  # Encipher message
         time = str(datetime.datetime.now().time().strftime("%H%M"))
         date = str(datetime.date.today())
-        print(date)
+        # print(date)
         daykey, _ = get_daykey(date)
-        print(daykey)
+        # print(daykey)
         key_dayofmonth, key_rotors, key_rings, \
             key_connections, key_kenngruppen = divide_key(daykey)
 
@@ -102,6 +102,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
                    key_rings,
                    key_connections]
             enc_msg_key = enigma_M3(key, msg_key)
+            print(f"{enc_msg_key}")
 
             # make buchstabenkenngruppen
             letterIDgroup = ''.join(secrets.choice(rotor0) for i in range(2)) \
@@ -239,7 +240,9 @@ def get_key_from_date(date):
     keyfilename = "enigmaSchlussel" + str(date)[:7] + ".txt"
     with open(keyfilename, "r") as infile:
         for line in infile:
+            # print(line, end="")
             if re.search(str(date)[-2:], line[:6]):
+                # print(line)
                 return line
 
 def divide_key(daykey):
@@ -268,11 +271,11 @@ def divide_key(daykey):
 
     key_kenngruppen = keyparts[5].split()
 
-    return key_dayofmonth,
-    key_rotors,
-    key_rings,
-    key_connections,
-    key_kenngruppen
+    return key_dayofmonth,\
+        key_rotors,\
+        key_rings,\
+        key_connections,\
+        key_kenngruppen
 
 def clean_plain(s):
     """Clean plain text and prepare it for enciphering."""
