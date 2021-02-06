@@ -43,7 +43,11 @@ def main():
     reglene for enigma. Hvis vi skal få sjekket skikkelig må vi skrive enda \
     litt til, kanskje helt ut hit."
 #    message = "F Q 2143 = 14 = FGH ZAS\nDQLOP NWSSD LFBB"
-#    message = "F Q 1230  = 250 = WZA UHL FDJKM LDAHH YEOEF PTWYB LENDP MKOXL DFAMU DWIJD XRJZY DFRIO MFTEV KTGUY DDZED TPOQX FDRIU CCBFM MQWYE FIPUL WSXHG YHJZE AOFDU FUTEC VVBDP OLZLG DEJTI HGYER DCXCV BHSEE TTKJK XAAQU GTTUO FCXZH IDREF TGHSZ DERFG EDZZS ERDET RFGTT RREOM MJMED EDDER FTGRE UUHKD DLEFG FGREZ ZZSEU YYRGD EDFED HJUIK FXNVB"
+    message = "F Q 1230  = 250 = WZA UHL FDJKM LDAHH YEOEF PTWYB LENDP MKOXL \
+        DFAMU DWIJD XRJZY DFRIO MFTEV KTGUY DDZED TPOQX FDRIU CCBFM MQWYE \
+        FIPUL WSXHG YHJZE AOFDU FUTEC VVBDP OLZLG DEJTI HGYER DCXCV BHSEE \
+        TTKJK XAAQU GTTUO FCXZH IDREF TGHSZ DERFG EDZZS ERDET RFGTT RREOM \
+        MJMED EDDER FTGRE UUHKD DLEFG FGREZ ZZSEU YYRGD EDFED HJUIK FXNVB"
 
     enig_op(message, recipient=to, sender=sender, encipher=True, month=None)
 
@@ -79,7 +83,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
         print(message)
         plaintext = clean_plain(message)
         maxlength = 245
-        parts = [plaintext[i:i+maxlength] \
+        parts = [plaintext[i: i + maxlength] \
                  for i in range(0, len(plaintext), maxlength)]
 
         for n in range(len(parts)):
@@ -92,7 +96,11 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
             msg_key_list = msg_key.replace("", " ").split()
 
             # encipher message key using message start pos
-            key = [key_rotors,[reflB], msg_start_list, key_rings, key_connections]
+            key = [key_rotors,
+                   [reflB],
+                   msg_start_list,
+                   key_rings,
+                   key_connections]
             enc_msg_key = enigma_M3(key, msg_key)
 
             # make buchstabenkenngruppen
@@ -100,15 +108,20 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
                             + secrets.choice(key_kenngruppen)
 
             # Encipher message
-            key = [key_rotors,[reflB], msg_key_list, key_rings, key_connections]
+            key = [key_rotors,
+                   [reflB],
+                   msg_key_list,
+                   key_rings,
+                   key_connections]
             cipher = enigma_M3.encipher(key, parts[n], verbose=verbose)
 
             # Format output
             # start of message is
-            # # To: From: Clock: Lettercount: Start pos: Enciphered message key:
-            # # Fiveletter group containing two random letters and the 3 letter kenngruppe
+            # To: From: Clock: Lettercount: Start pos: Enciphered message key:
+            # Fiveletter group containing two random letters
+            # and the 3 letter kenngruppe
             lettercount = len(cipher) + len(letterIDgroup)
-            precipher = str(recipient) + " "  + str(sender) + " " + str(time) \
+            precipher = str(recipient) + " " + str(sender) + " " + str(time)\
                 + " = " + str(lettercount) + " = " \
                 + msg_start + " " + enc_msg_key + "\n" + letterIDgroup + " "
 
@@ -128,7 +141,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
 
         # Find time
         time = re.search("[0-9]{4}", message)[0]
-        time = time[:2] +":"+ time[-2:]
+        time = time[:2] + ":" + time[-2:]
 
         # Find message start pos
         # Find enciphered message key
@@ -146,7 +159,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
             key_connections, key_kenngruppen = divide_key(daykey)
 
         # Decipher message key
-        key = [key_rotors,[reflB], msg_start_list, key_rings, key_connections]
+        key = [key_rotors, [reflB], msg_start_list, key_rings, key_connections]
         msg_key = enigma_M3(key, enc_msg_key)
         msg_key_list = msg_key.replace("", " ").split()
 
@@ -155,13 +168,13 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
 
         # Decipher message.
         print(message)
-        key = [key_rotors,[reflB], msg_key_list, key_rings, key_connections]
+        key = [key_rotors, [reflB], msg_key_list, key_rings, key_connections]
         plain = enigma_M3(key, cipher).lower()
         print(str(date), end="  ")
         print(printable_key(key))
         preplain = "Til " + recipient + "fra " + sender \
-            + str(date) + " " + time +"\n"
-        print(preplain+plain)
+            + str(date) + " " + time + "\n"
+        print(preplain + plain)
 
 def printable_key(key):
     """Return string to print the daykey nicely."""
@@ -211,13 +224,15 @@ def get_daykey(label, month=None):
         with open(keyfilename, "r") as infile:
             for line in infile:
                 if re.search(str(label), line):
-                    # Correct the date to show the date on which the key was valid.
+                    # Correct the date to show the date on which
+                    # the key was valid.
                     day = datetime.date(int(keyfilename[15:19]),\
                                         int(keyfilename[20:22]),\
                                         int(re.search("[0-9]{2}", line)[0]))
                     return line, str(day)
     else:
-        print(f"Label format not recognised {label}.")  # Program will crash here.
+        # Program will crash here.
+        print(f"Label format not recognised {label}.")
 
 def get_key_from_date(date):
     """Return daykey of given day."""
@@ -248,12 +263,16 @@ def divide_key(daykey):
 
     key_connections = keyparts[4]
 #    print(key_connections)
-    key_connections = key_connections.lstrip().rstrip()###.replace(" ", ".")
+    key_connections = key_connections.lstrip().rstrip()  # .replace(" ", ".")
 #    print(key_connections)
 
     key_kenngruppen = keyparts[5].split()
 
-    return key_dayofmonth, key_rotors, key_rings, key_connections, key_kenngruppen
+    return key_dayofmonth,
+    key_rotors,
+    key_rings,
+    key_connections,
+    key_kenngruppen
 
 def clean_plain(s):
     """Clean plain text and prepare it for enciphering."""
@@ -263,8 +282,10 @@ def clean_plain(s):
 # YY = Point or dot
 # X****X = Inverted commas
 
-# Question mark (Fragezeichen in German) was usually abbreviated to FRAGE, FRAGEZ or FRAQ.
-# Foreign names, places, etc. are delimited twice by "X", as in XPARISXPARISX or XFEUERSTEINX.
+# Question mark (Fragezeichen in German) was usually abbreviated to
+# FRAGE, FRAGEZ or FRAQ.
+# Foreign names, places, etc. are delimited twice by "X", as in
+# XPARISXPARISX or XFEUERSTEINX.
 # The letters CH were written as Q. ACHT became AQT, RICHTUNG became RIQTUNG.
 
 # Numbers were written out as NULL EINZ ZWO DREI VIER FUNF SEQS SIEBEN AQT NEUN
@@ -274,7 +295,7 @@ def clean_plain(s):
 
     s = s.replace("", " ").split()
     for i, letter in enumerate(s):
-        #print(i, s[i])
+        # print(i, s[i])
         if letter.upper() in rotor0 or letter in rotor0:
             # Lower case letter or upper case letter
             s[i] = letter.upper()
@@ -335,22 +356,22 @@ def clean_plain(s):
             _ = s.pop(i)
             s.insert(i, "NEUN")
         elif letter == "0":  # Not convinced this is the most elegant.
-            if i+1 < len(s):
-                if s[i+1] != "0":
+            if i + 1 < len(s):
+                if s[i + 1] != "0":
                     _ = s.pop(i)
                     s.insert(i, "NULL")
-                elif i+2 < len(s) and s[i+1] == "0":
-                    if s[i+2] != "0":
-                         _ = s.pop(i)
-                         _ = s.pop(i)
-                         s.insert(i, "CENTA")
-                    elif i+3 < len(s) and s[i+2] == "0":
-                        if s[i+3] != "0":
-                             _ = s.pop(i)
-                             _ = s.pop(i)
-                             _ = s.pop(i)
-                             s.insert(i, "MILLE")
-                        elif s[i+3] == "0":
+                elif i + 2 < len(s) and s[i + 1] == "0":
+                    if s[i + 2] != "0":
+                        _ = s.pop(i)
+                        _ = s.pop(i)
+                        s.insert(i, "CENTA")
+                    elif i + 3 < len(s) and s[i + 2] == "0":
+                        if s[i + 3] != "0":
+                            _ = s.pop(i)
+                            _ = s.pop(i)
+                            _ = s.pop(i)
+                            s.insert(i, "MILLE")
+                        elif s[i + 3] == "0":
                             _ = s.pop(i)
                             _ = s.pop(i)
                             _ = s.pop(i)
@@ -366,8 +387,8 @@ def clean_plain(s):
                     _ = s.pop(i)
                     s.insert(i, "CENTA")
             else:
-                 _ = s.pop(i)
-                 s.insert(i, "NULL")
+                _ = s.pop(i)
+                s.insert(i, "NULL")
         else:
             # Discard all else
             print(f"Character not allowed. Discarded character: {s[i]}")
@@ -378,7 +399,7 @@ def clean_plain(s):
 def format_in_groups(s, group=5):
     """Format the cipher text in groups for transmission."""
     # Adds a space every five characters or so.
-    return " ".join(s[i:i+group] for i in range(0, len(s), group))
+    return " ".join(s[i: i + group] for i in range(0, len(s), group))
 
 class enigma_M3():
     """Emulates the Enigma M3 machine.
@@ -406,22 +427,22 @@ class enigma_M3():
     # TODO: Implement list of rotors as class attributes
     # TODO: Reshape key and refer to rotors by string of roman number.
     __rotors = [
-    #    0 : "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split(),
-    # rotor = ["name", "cipher alpha", [notches]]
-        ["0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
+        # 0 : "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split(),
+        # rotor = ["name", "cipher alpha", [notches]]
+        ["0",   "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
         ["I",   "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q"]],  # Q = 17
         ["II",  "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E"]],  # E = 05
         ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V"]],  # V = 22
         ["IV",  "ESOVPZJAYQUIRHXLNFTGKDCMWB", ["J"]],  # J = 10
         ["V",   "VZBRGITYUPSDNHLXAWMJQOFECK", ["Z"]],  # Z = 26
-    # Rotors VI - VIII only on Enigma M3, not on the Enigma I.
+        # Rotors VI - VIII only on Enigma M3, not on the Enigma I.
         ["VI",  "JPGVOUMFYQBENHZRDKASXLICTW", ["Z", "M"]],  # Z=26, M=13
         ["VII", "NZJHGRCXMYSWBOUFAIVLPEKQDT", ["Z", "M"]],  # Z=26, M=13
         ["VIII","FKQHTLXOCBJSPDZRAMEWNIUYGV", ["Z", "M"]],  # Z=26, M=13
-        ]
+    ]
 
     def __init__(self, key, text, verbose=False):
-        self.plaintext = text # TODO Move this to method encipher
+        self.plaintext = text  # TODO Move this to method encipher
         self.verbose = verbose
         # TODO for i in range(len(key[0])):
         # Make the number of active rotors adjustable.
@@ -556,7 +577,7 @@ class Rotor(Disk):
         self._position = 0
         self.ring = ring
         self._set_ring(ring)
-        self._set_start(self._alpha_plain.index(str(start))+1)
+        self._set_start(self._alpha_plain.index(str(start)) + 1)
 
     def _set_start(self, startpos):
         """Set the start position for this rotor."""
@@ -573,13 +594,13 @@ class Rotor(Disk):
 
     def get_position(self):
         """Return Rotor's position."""
-        return (self._position + self.ring - 1) % len(self._alpha_plain)#26
+        return (self._position + self.ring - 1) % len(self._alpha_plain)  # 26
 
     def turn(self, n=1):
         """Turn the rotor the appropriate number of steps."""
         self._alpha_vor = self._alpha_vor[n:] + self._alpha_vor[:n]
         self.set_ruck()
-        self._position = (self._position + n) % len(self._alpha_plain) #26
+        self._position = (self._position + n) % len(self._alpha_plain)  # 26
         return self.get_position()
 
     def vor(self, ch):
@@ -602,7 +623,8 @@ class Rotor(Disk):
         This function substitutes while the signal moves "back" thru
         the disk, i.e. from the reflector.
         """
-        i = (self._alpha_plain.index(ch) + self._position) % len(self._alpha_plain)#26
+        i = (self._alpha_plain.index(ch) + self._position) \
+            % len(self._alpha_plain)  # 26
         ch = self._alpha_ruck[i]
         return ch
 
@@ -628,7 +650,7 @@ class Plugboard():
         self._alpha_plain = rotor0[:]
         self._alpha_vor = rotor0[:]
         self._sanity_check(connections)
-        self.connections = connections.split()###.replace(".", " ").split()
+        self.connections = connections.split()  # .replace(".", " ").split()
 
         # Build the _alpha_vor
         while len(self.connections) > 0:  # Until the list is empty
@@ -637,21 +659,23 @@ class Plugboard():
             self._alpha_vor[j], self._alpha_vor[k] = \
                 self._alpha_vor[k], self._alpha_vor[j]  # swap
         # Fill self.connections again, so its not empty when __str__ gets it.
-        self.connections = connections.split()###.replace(".", " ").split()
+        self.connections = connections.split()  # .replace(".", " ").split()
 
     def _sanity_check(self, connections):
         """Check plugboard input for sanity."""
         self._alpha_sane = self._alpha_vor[:]
         if len(connections.replace(" ", "")) % 2 != 0:
             # Odd number of letters not allowed in plugboard settings.
-            raise ValueError(f"Invalid plugboard settings (odd number): {connections}.")
+            raise ValueError(f"Invalid plugboard settings \
+                             (odd number): {connections}.")
         for ch in connections:
             try:
                 if ch in self._alpha_plain:
                     self._alpha_sane.pop(self._alpha_sane.index(ch))
             except ValueError:
                 # Some letter occurs twice.
-                raise ValueError(f"Invalid plugboard settings (letter twice): {connections}.")
+                raise ValueError(f"Invalid plugboard settings \
+                                 (letter twice): {connections}.")
 
     def __str__(self):
         """Return string representation of plugboard settings."""
@@ -670,6 +694,7 @@ class Plugboard():
         """Substitute letter, according to plugboard setting."""
         # Plugboard is symmetric.
         return self.vor(ch)
+
 
 if __name__ == "__main__":
     main()
