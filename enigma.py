@@ -101,8 +101,9 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
                    msg_start_list,
                    key_rings,
                    key_connections]
+            # Should make enigma_M3 object, then run the encipher method.
             enc_msg_key = enigma_M3(key, msg_key)
-            print(f"{enc_msg_key}")
+            print(f"{enc_msg_key}")  # TODO: Things fail here
 
             # make buchstabenkenngruppen
             letterIDgroup = ''.join(secrets.choice(rotor0) for i in range(2)) \
@@ -641,8 +642,8 @@ class Reflector(Disk):
 
     def _sanity_check(self):
         if self._alpha_vor != self._alpha_ruck:
-            raise ValueError("Reflector wires not correct. "
-                             + "Should be symmetric. "
+            raise ValueError("Reflector wires not correct. "\
+                             + "Should be symmetric. "\
                              + f"\n{self._alpha_vor}\n{self._alpha_ruck}")
 
 
