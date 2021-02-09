@@ -49,10 +49,10 @@ def main():
 #     + "TTKJK XAAQU GTTUO FCXZH IDREF TGHSZ DERFG EDZZS ERDET RFGTT RREOM "\
 #     + "MJMED EDDER FTGRE UUHKD DLEFG FGREZ ZZSEU YYRGD EDFED HJUIK FXNVB"\
     message = "Skal vi se, da, funker det?"
-    # message = "F Q 2115 = 33 = HXA QLQ"\
-    #           + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
+    message = "F Q 2115 = 33 = HXA QLQ "\
+              + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
 
-    enig_op(message, recipient=to, sender=sender, encipher=True, month=None)
+    enig_op(message, recipient=to, sender=sender, encipher=False, month=None)
 
 def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
     """Emulates the operator of the Enigma M3.
@@ -153,6 +153,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
         # Find message start pos
         # Find enciphered message key
         tla = re.findall("(?=( [A-Z]{3}[\s]))", message)  # ThreeLetterAcronym
+        print(f"{tla=}")
         msg_start = tla[0][1:-1]
         enc_msg_key = tla[1][1:-1]
         msg_start_list = msg_start.replace("", " ").split()
@@ -167,16 +168,21 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
 
         # Decipher message key
         key = [key_rotors, [reflB], msg_start_list, key_rings, key_connections]
-        msg_key = enigma_M3(key, enc_msg_key)
+        enigma = Enigma_M3(key)
+        msg_key = enigma.encipher(enc_msg_key)
+        print(f"{msg_key=}")
         msg_key_list = msg_key.replace("", " ").split()
 
         # Get the actual message, i.e. after the 5 letter kenngruppen
         cipher = message.partition(kenngruppen)[-1].replace(" ", "")
+        print(f"{cipher=}")
 
         # Decipher message.
         print(message)
         key = [key_rotors, [reflB], msg_key_list, key_rings, key_connections]
-        plain = enigma_M3(key, cipher).lower()
+        enigma = Enigma_M3(key)
+        plain = enigma.encipher(cipher)
+        plain.lower()
         print(str(date), end="  ")
         print(printable_key(key))
         preplain = "Til " + recipient + "fra " + sender \
