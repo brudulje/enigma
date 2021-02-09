@@ -37,17 +37,20 @@ def main():
     sender = "Q"  # May not match regexp [A-Z]{5}
 #    message = "F Q 2128 = 30 = FTK SAZ\nSQYNB ADEGL JLWLT VSTPM BXYTN IBHOT"
 #    message = "F Q 1944 = 30 = FPQ IBD\nMZQRE FMKSW BBMEW GIPUN XQOFC ZYLYR"
-    message = "Nå begynner vi å nærme oss. Men først må vi teste om vi kan \
-    sende en kjempelang melding, en som ikke får plass i en SMS, så den må \
-    deles opp i flere deler, så den ikke bryter med de kryptografiske \
-    reglene for enigma. Hvis vi skal få sjekket skikkelig må vi skrive enda \
-    litt til, kanskje helt ut hit."
+    # message = "Nå begynner vi å nærme oss. Men først må vi teste om vi kan \
+    # sende en kjempelang melding, en som ikke får plass i en SMS, så den må \
+    # deles opp i flere deler, så den ikke bryter med de kryptografiske \
+    # reglene for enigma. Hvis vi skal få sjekket skikkelig må vi skrive enda \
+    # litt til, kanskje helt ut hit."
 #    message = "F Q 2143 = 14 = FGH ZAS\nDQLOP NWSSD LFBB"
-    message = "F Q 1230  = 250 = WZA UHL FDJKM LDAHH YEOEF PTWYB LENDP MKOXL "\
-        + "DFAMU DWIJD XRJZY DFRIO MFTEV KTGUY DDZED TPOQX FDRIU CCBFM MQWYE "\
-        + "FIPUL WSXHG YHJZE AOFDU FUTEC VVBDP OLZLG DEJTI HGYER DCXCV BHSEE "\
-        + "TTKJK XAAQU GTTUO FCXZH IDREF TGHSZ DERFG EDZZS ERDET RFGTT RREOM "\
-        + "MJMED EDDER FTGRE UUHKD DLEFG FGREZ ZZSEU YYRGD EDFED HJUIK FXNVB"\
+# message = "F Q 1230  = 250 = WZA UHL FDJKM LDAHH YEOEF PTWYB LENDP MKOXL "\
+#     + "DFAMU DWIJD XRJZY DFRIO MFTEV KTGUY DDZED TPOQX FDRIU CCBFM MQWYE "\
+#     + "FIPUL WSXHG YHJZE AOFDU FUTEC VVBDP OLZLG DEJTI HGYER DCXCV BHSEE "\
+#     + "TTKJK XAAQU GTTUO FCXZH IDREF TGHSZ DERFG EDZZS ERDET RFGTT RREOM "\
+#     + "MJMED EDDER FTGRE UUHKD DLEFG FGREZ ZZSEU YYRGD EDFED HJUIK FXNVB"\
+    message = "Skal vi se, da, funker det?"
+    # message = "F Q 2115 = 33 = HXA QLQ"\
+    #           + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
 
     enig_op(message, recipient=to, sender=sender, encipher=True, month=None)
 
@@ -102,21 +105,23 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
                    key_rings,
                    key_connections]
             # Should make enigma_M3 object, then run the encipher method.
-            enc_msg_key = enigma_M3(key, msg_key)
-            print(f"{enc_msg_key}")  # TODO: Things fail here
+            enigma = Enigma_M3(key)
+            enc_msg_key = enigma.encipher(msg_key)
+            # print(f"{enc_msg_key=}")  # TODO: Things fail here
 
             # make buchstabenkenngruppen
             letterIDgroup = ''.join(secrets.choice(rotor0) for i in range(2)) \
                             + secrets.choice(key_kenngruppen)
-
+            # print(f"{letterIDgroup=}")
             # Encipher message
             key = [key_rotors,
                    [reflB],
                    msg_key_list,
                    key_rings,
                    key_connections]
-            cipher = enigma_M3.encipher(key, parts[n], verbose=verbose)
-
+            enigma = Enigma_M3(key)
+            cipher = enigma.encipher(parts[n], verbose=verbose)
+            # print(f"{cipher=}")
             # Format output
             # start of message is
             # To: From: Clock: Lettercount: Start pos: Enciphered message key:
@@ -280,22 +285,23 @@ def divide_key(daykey):
 
 def clean_plain(s):
     """Clean plain text and prepare it for enciphering."""
-# KLAM = Parenthesis
-# ZZ = Comma
-# X = Full stop (end of sentence)
-# YY = Point or dot
-# X****X = Inverted commas
+    # KLAM = Parenthesis
+    # ZZ = Comma
+    # X = Full stop (end of sentence)
+    # YY = Point or dot
+    # X****X = Inverted commas
 
-# Question mark (Fragezeichen in German) was usually abbreviated to
-# FRAGE, FRAGEZ or FRAQ.
-# Foreign names, places, etc. are delimited twice by "X", as in
-# XPARISXPARISX or XFEUERSTEINX.
-# The letters CH were written as Q. ACHT became AQT, RICHTUNG became RIQTUNG.
+    # Question mark (Fragezeichen in German) was usually abbreviated to
+    # FRAGE, FRAGEZ or FRAQ.
+    # Foreign names, places, etc. are delimited twice by "X", as in
+    # XPARISXPARISX or XFEUERSTEINX.
+    # The letters CH were written as Q. ACHT became AQT, RICHTUNG
+    # became RIQTUNG.
 
-# Numbers were written out as NULL EINZ ZWO DREI VIER FUNF SEQS SIEBEN AQT NEUN
-# It was prohibited to encipher the word "NULL" several times in succession,
-# so they used CENTA (00), MILLE (000) and MYRIA (0000).
-# Some examples: 200 = ZWO CENTA, 00780 = CENTA SIEBEN AQT NULL.
+    # Numbers were written as NULL EINZ ZWO DREI VIER FUNF SEQS SIEBEN AQT NEUN
+    # It was prohibited to encipher the word "NULL" several times in a row,
+    # so they used CENTA (00), MILLE (000) and MYRIA (0000).
+    # Some examples: 200 = ZWO CENTA, 00780 = CENTA SIEBEN AQT NULL.
 
     s = s.replace("", " ").split()
     for i, letter in enumerate(s):
@@ -405,7 +411,7 @@ def format_in_groups(s, group=5):
     # Adds a space every five characters or so.
     return " ".join(s[i: i + group] for i in range(0, len(s), group))
 
-class enigma_M3():
+class Enigma_M3():
     """Emulates the Enigma M3 machine.
 
     Args:
@@ -445,7 +451,7 @@ class enigma_M3():
         ["VIII","FKQHTLXOCBJSPDZRAMEWNIUYGV", ["Z", "M"]],  # Z=26, M=13
     ]
 
-    def __init__(self, key, text, verbose=False):
+    def __init__(self, key, text="", verbose=False):
         self.plaintext = text  # TODO Move this to method encipher
         self.verbose = verbose
         # TODO for i in range(len(key[0])):
