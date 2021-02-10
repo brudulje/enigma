@@ -155,7 +155,6 @@ def main():
             + str(date) + " " + time + "\n"
         print(preplain + plain)
 
-    # operator(message, recipient=to, sender=sender, encipher=False, month=None)
 
 class Operator():
     # message, recipient=None, sender=None, encipher=True, month=None):
@@ -176,6 +175,7 @@ class Operator():
 
     Return: Returns nothing, but prints the result to terminal.
     """
+
     def __init__(self):
         pass
 
@@ -193,7 +193,8 @@ class Operator():
 
         Return:
             (str) daykey matching label
-                "| 31 | I II V | 06 22 14 | PO ML IU KJ NH YT GB VF RE DC | EXS TGY IKJ LOP |"
+                "| 31 | I II V | 06 22 14 | PO ML IU KJ NH YT GB VF RE DC
+                | EXS TGY IKJ LOP |"
             (str) date on which given key is valid
         """
         # Check label format
@@ -262,7 +263,8 @@ class Operator():
 
         key_connections = keyparts[4]
     #    print(key_connections)
-        key_connections = key_connections.lstrip().rstrip()  # .replace(" ", ".")
+        key_connections = key_connections.lstrip().rstrip()
+        # .replace(" ", ".")
     #    print(key_connections)
 
         key_kenngruppen = keyparts[5].split()
@@ -301,7 +303,8 @@ class Operator():
         # The letters CH were written as Q. ACHT became AQT, RICHTUNG
         # became RIQTUNG.
 
-        # Numbers were written as NULL EINZ ZWO DREI VIER FUNF SEQS SIEBEN AQT NEUN
+        # Numbers were written as NULL EINZ ZWO DREI VIER FUNF
+        # SEQS SIEBEN AQT NEUN
         # It was prohibited to encipher the word "NULL" several times in a row,
         # so they used CENTA (00), MILLE (000) and MYRIA (0000).
         # Some examples: 200 = ZWO CENTA, 00780 = CENTA SIEBEN AQT NULL.
@@ -414,6 +417,7 @@ class Operator():
         # Adds a space every five characters or so.
         return " ".join(s[i: i + group] for i in range(0, len(s), group))
 
+
 def printable_key(key):
     """Return string to print the daykey nicely."""
     # TODO: Make class Key()
@@ -421,6 +425,7 @@ def printable_key(key):
          + key[2][0] + " "    + key[2][1] + " "    + key[2][2] + "  "\
      + str(key[3][0]) +" "+ str(key[3][1]) +" "+ str(key[3][2]) + "  "\
          + key[4]
+
 
 class Enigma_M3():
     """Emulates the Enigma M3 machine.
