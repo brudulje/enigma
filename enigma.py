@@ -72,7 +72,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
 
     Return: Returns nothing, but prints the result to terminal.
     """
-    verbose = False  # For debugging
+    verbose = True  # For debugging
     if encipher:  # Encipher message
         time = str(datetime.datetime.now().time().strftime("%H%M"))
         date = str(datetime.date.today())
@@ -106,7 +106,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
                    key_connections]
             # Should make enigma_M3 object, then run the encipher method.
             enigma = Enigma_M3(key)
-            enc_msg_key = enigma.encipher(msg_key)
+            enc_msg_key = enigma.encipher(msg_key, verbose=verbose)
             # print(f"{enc_msg_key=}")  # TODO: Things fail here
 
             # make buchstabenkenngruppen
@@ -120,7 +120,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
                    key_rings,
                    key_connections]
             enigma = Enigma_M3(key)
-            cipher = enigma.encipher(parts[n], verbose=verbose)
+            cipher = enigma.encipher(parts[n], verbose=verbose)  # , verbose=verbose)
             # print(f"{cipher=}")
             # Format output
             # start of message is
@@ -153,7 +153,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
         # Find message start pos
         # Find enciphered message key
         tla = re.findall("(?=( [A-Z]{3}[\s]))", message)  # ThreeLetterAcronym
-        print(f"{tla=}")
+        # print(f"{tla=}")
         msg_start = tla[0][1:-1]
         enc_msg_key = tla[1][1:-1]
         msg_start_list = msg_start.replace("", " ").split()
@@ -169,19 +169,19 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
         # Decipher message key
         key = [key_rotors, [reflB], msg_start_list, key_rings, key_connections]
         enigma = Enigma_M3(key)
-        msg_key = enigma.encipher(enc_msg_key)
-        print(f"{msg_key=}")
+        msg_key = enigma.encipher(enc_msg_key, verbose=verbose)
+        # print(f"{msg_key=}")
         msg_key_list = msg_key.replace("", " ").split()
 
         # Get the actual message, i.e. after the 5 letter kenngruppen
         cipher = message.partition(kenngruppen)[-1].replace(" ", "")
-        print(f"{cipher=}")
+        # print(f"{cipher=}")
 
         # Decipher message.
         print(message)
         key = [key_rotors, [reflB], msg_key_list, key_rings, key_connections]
         enigma = Enigma_M3(key)
-        plain = enigma.encipher(cipher)
+        plain = enigma.encipher(cipher, verbose=verbose)
         plain.lower()
         print(str(date), end="  ")
         print(printable_key(key))
@@ -457,9 +457,24 @@ class Enigma_M3():
         ["VIII","FKQHTLXOCBJSPDZRAMEWNIUYGV", ["Z", "M"]],  # Z=26, M=13
     ]
 
-    def __init__(self, key, text="", verbose=False):
-        self.plaintext = text  # TODO Move this to method encipher
-        self.verbose = verbose
+    def __init__(self, key):  # , verbose=False):
+        """
+        Sets up the Enigma according to given key.
+
+        Parameters
+        ----------
+        key : list
+            [key_rotors, [reflB], msg_start_list, key_rings, key_connections].
+        verbose : bool, optional
+            Print all the steps in the enciphering process to terminal.
+            The default is False.
+
+        Returns
+        -------
+        None.
+
+        """
+        # self.verbose = verbose
         # TODO for i in range(len(key[0])):
         # Make the number of active rotors adjustable.
 
@@ -471,6 +486,26 @@ class Enigma_M3():
         self.plg = Plugboard(key[4])
 
     def encipher(self, text, verbose=False):
+        """
+        Encipher text.
+
+        The text is enciphered (or if it is already enciphered, deciphered).
+
+        Parameters
+        ----------
+        text : str
+            The text to encipher.
+        verbose : bool, optional
+            Print all the steps in the enciphering process to terminal.
+            The default is False.
+
+        Returns
+        -------
+        cipher : TYPE
+            DESCRIPTION.
+
+        """
+        self.plaintext = text
         cipher = ""
 
         # Print starting position and settings.
@@ -499,7 +534,7 @@ class Enigma_M3():
 
             # Encipher text
             if verbose:
-                print(f"{ch} ", end="")
+                print(f"{ch}  ", end="")
             ch = self.plg.vor(ch)
             if verbose:
                 print(f"-> {ch} ", end="")
@@ -526,7 +561,7 @@ class Enigma_M3():
                 print(f"-> {ch} ", end="")
             ch = self.plg.ruck(ch)
             if verbose:
-                print(f"->  {ch}.")
+                print(f"->  {ch}")
 
             cipher += ch
         return cipher
@@ -535,11 +570,11 @@ class Enigma_M3():
     #     """Print names of active rotors."""
     #     print(l.get_name() + " " + m.get_name() + " " + r.get_name(), end=end)
 
-    # def print_pos(l, m, r, end="\n"):
-    #     """Print current positions of the rotors."""
-    #     print(chr(l.get_position() + 65) + " " \
-    #             + chr(m.get_position() + 65) + " " \
-    #             + chr(r.get_position() + 65), end=end)
+    def print_pos(self, lef, mid, rgt, end="\n"):
+        """Print current positions of the rotors."""
+        print(chr(lef.get_position() + 65) + " " \
+              + chr(mid.get_position() + 65) + " " \
+              + chr(rgt.get_position() + 65), end=end)
 
     # def print_rings(l, m, r, end="\n"):
     #     """Print ring positions on the rotors."""
@@ -561,9 +596,9 @@ class Disk():
         """Return string representation of Disk object."""
         return f"Disk, wires {self._wires}."
 
-    def get_name(self):
-        """Return the name of this Disk."""
-        return self._name
+    # def get_name(self):
+    #     """Return the name of this Disk."""
+    #     return self._name
 
     def vor(self, ch):
         """Substitute letter, according to disk wiring.
