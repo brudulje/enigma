@@ -290,7 +290,20 @@ def divide_key(daykey):
         key_kenngruppen
 
 def clean_plain(s):
-    """Clean plain text and prepare it for enciphering."""
+    """
+    Clean plain text and prepare it for enciphering.
+
+    Parameters
+    ----------
+    s : str
+        The "raw" text to be cleaned.
+
+    Returns
+    -------
+    str
+        The clean text, containing only characters present
+        in the Enigma keyboard.
+    """
     # KLAM = Parenthesis
     # ZZ = Comma
     # X = Full stop (end of sentence)
@@ -501,8 +514,8 @@ class Enigma_M3():
 
         Returns
         -------
-        cipher : TYPE
-            DESCRIPTION.
+        cipher : str
+            The enciphered (or deciphered) text.
 
         """
         self.plaintext = text
@@ -570,15 +583,15 @@ class Enigma_M3():
     #     """Print names of active rotors."""
     #     print(l.get_name() + " " + m.get_name() + " " + r.get_name(), end=end)
 
+    # def print_rings(l, m, r, end="\n"):
+    #     """Print ring positions on the rotors."""
+    #     print(str(l.ring) + " " + str(m.ring) + " " + str(r.ring), end=end)
+
     def print_pos(self, lef, mid, rgt, end="\n"):
         """Print current positions of the rotors."""
         print(chr(lef.get_position() + 65) + " " \
               + chr(mid.get_position() + 65) + " " \
               + chr(rgt.get_position() + 65), end=end)
-
-    # def print_rings(l, m, r, end="\n"):
-    #     """Print ring positions on the rotors."""
-    #     print(str(l.ring) + " " + str(m.ring) + " " + str(r.ring), end=end)
 
 
 class Disk():
