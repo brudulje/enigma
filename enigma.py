@@ -23,7 +23,7 @@ rotorVI   = ["VI",  "JPGVOUMFYQBENHZRDKASXLICTW", ["Z", "M"]]  # Z=26, M=13
 rotorVII  = ["VII", "NZJHGRCXMYSWBOUFAIVLPEKQDT", ["Z", "M"]]  # Z=26, M=13
 rotorVIII = ["VIII","FKQHTLXOCBJSPDZRAMEWNIUYGV", ["Z", "M"]]  # Z=26, M=13
 # Reflector A only on Enigma I, not on the M3.
-# reflA = ["A", "EJMZALYXVBWFCRQUONTSPIKHGD"]
+reflA = ["A", "EJMZALYXVBWFCRQUONTSPIKHGD"]
 reflB = ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"]  # Standard on Enigma I.
 reflC = ["C", "FVPJIAOYEDRZXWGCTKUQSBNMHL"]
 
@@ -45,14 +45,14 @@ def main():
         time = str(datetime.datetime.now().time().strftime("%H%M"))
         date = str(datetime.date.today())
         # print(date)
-        daykey, _ = get_daykey(date)
+        daykey, _ = op.get_daykey(date)
         # print(daykey)
         key_dayofmonth, key_rotors, key_rings, \
-            key_connections, key_kenngruppen = divide_key(daykey)
+            key_connections, key_kenngruppen = op.divide_key(daykey)
 
         # Clean plain
         print(message)
-        plaintext = clean_plain(message)
+        plaintext = op.clean_plain(message)
         maxlength = 245
         parts = [plaintext[i: i + maxlength] \
                  for i in range(0, len(plaintext), maxlength)]
@@ -75,8 +75,7 @@ def main():
             # Should make enigma_M3 object, then run the encipher method.
             enigma = Enigma_M3(key)
             enc_msg_key = enigma.encipher(msg_key, verbose=verbose)
-            # print(f"{enc_msg_key=}")  # TODO: Things fail here
-
+            # print(f"{enc_msg_key=}")
             # make buchstabenkenngruppen
             letterIDgroup = ''.join(secrets.choice(rotor0) for i in range(2)) \
                             + secrets.choice(key_kenngruppen)
@@ -101,7 +100,7 @@ def main():
                 + msg_start + " " + enc_msg_key + "\n" + letterIDgroup + " "
 
             # # Enciphered message
-            cipher = format_in_groups(cipher)
+            cipher = op.format_in_groups(cipher)
             ciphertext = precipher + cipher
             print(str(date), end="  ")
             print(printable_key(key))
@@ -129,9 +128,9 @@ def main():
         kenngruppen = re.search("[A-Z]{5} ", message)[0][2:-1]
 
         # Look up key in book
-        daykey, date = get_daykey(kenngruppen, month=month)
+        daykey, date = op.get_daykey(kenngruppen, month=month)
         key_dayofmonth, key_rotors, key_rings, \
-            key_connections, key_kenngruppen = divide_key(daykey)
+            key_connections, key_kenngruppen = op.divide_key(daykey)
 
         # Decipher message key
         key = [key_rotors, [reflB], msg_start_list, key_rings, key_connections]
@@ -177,248 +176,251 @@ class Operator():
 
     Return: Returns nothing, but prints the result to terminal.
     """
+    def __init__(self):
+        pass
 
+    def get_daykey(self, label, month=None):
+        """Return the daykey for the given date or kenngruppen.
 
-def printable_key(key):
-    """Return string to print the daykey nicely."""
-    return key[0][0][0] + " " + key[0][1][0] + " " + key[0][2][0] + "  "\
-         + key[2][0] + " "    + key[2][1] + " "    + key[2][2] + "  "\
-     + str(key[3][0]) +" "+ str(key[3][1]) +" "+ str(key[3][2]) + "  "\
-         + key[4]
+        Args:
+           label (str):
+               One of 3 formats;
+               Two digits: dd; day of month, assuming this month.
+               Four-two-two digits: yyyy-mm-dd; explicit date.
+               3 letters: kenngruppen.
+           month (str, optional):
+               yyyy-mm: explicit month to use to look for key
 
-def get_daykey(label, month=None):
-    """Return the daykey for the given date or kenngruppen.
+        Return:
+            (str) daykey matching label
+                "| 31 | I II V | 06 22 14 | PO ML IU KJ NH YT GB VF RE DC | EXS TGY IKJ LOP |"
+            (str) date on which given key is valid
+        """
+        # Check label format
+        if re.match("[0-9]{4}-[0-9]{2}-[0-9]{2}", label):
+            # Label is a date
+            day = datetime.datetime.strptime(label, "%Y-%m-%d").date()
+            return self.get_key_from_date(day), str(day)
+        elif re.match("[0-9]{2}", label):
+            # Label is a day of month, assuming this month
+            if month is None:
+                today = datetime.date.today()
+                day = datetime.date(today.year, today.month, int(label))
+            else:
+                day = datetime.date(month[:4], month[-2:], label)
+            return self.get_key_from_date(day), str(day)
 
-    Args:
-       label (str):
-           One of 3 formats;
-           Two digits: dd; day of month, assuming this month.
-           Four-two-two digits: yyyy-mm-dd; explicit date.
-           3 letters: kenngruppen.
-       month (str, optional):
-           yyyy-mm: explicit month to use to look for key
-
-    Return:
-        (str) daykey matching label
-            "| 31 | I II V | 06 22 14 | PO ML IU KJ NH YT GB VF RE DC | EXS TGY IKJ LOP |"
-        (str) date on which given key is valid
-    """
-    # Check label format
-    if re.match("[0-9]{4}-[0-9]{2}-[0-9]{2}", label):
-        # Label is a date
-        day = datetime.datetime.strptime(label, "%Y-%m-%d").date()
-        return get_key_from_date(day), str(day)
-    elif re.match("[0-9]{2}", label):
-        # Label is a day of month, assuming this month
-        if month is None:
-            today = datetime.date.today()
-            day = datetime.date(today.year, today.month, int(label))
+        elif re.match("[A-Z]{3}", label):
+            # Label is a kenngruppe, assuming from this month
+            if month is None:
+                day = datetime.date.today()
+            else:
+                day = datetime.date(month[:4], month[-2:], 1)
+            keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
+            with open(keyfilename, "r") as infile:
+                for line in infile:
+                    if re.search(str(label), line):
+                        # Correct the date to show the date on which
+                        # the key was valid.
+                        day = datetime.date(int(keyfilename[15:19]),\
+                                            int(keyfilename[20:22]),\
+                                            int(re.search("[0-9]{2}",\
+                                                          line)[0]))
+                        return line, str(day)
         else:
-            day = datetime.date(month[:4], month[-2:], label)
-        return get_key_from_date(day), str(day)
+            # Program will crash here.
+            print(f"Label format not recognised {label}.")
 
-    elif re.match("[A-Z]{3}", label):
-        # Label is a kenngruppe, assuming from this month
-        if month is None:
-            day = datetime.date.today()
-        else:
-            day = datetime.date(month[:4], month[-2:], 1)
-        keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
+    def get_key_from_date(self, date):
+        """Return daykey of given day."""
+        keyfilename = "enigmaSchlussel" + str(date)[:7] + ".txt"
         with open(keyfilename, "r") as infile:
             for line in infile:
-                if re.search(str(label), line):
-                    # Correct the date to show the date on which
-                    # the key was valid.
-                    day = datetime.date(int(keyfilename[15:19]),\
-                                        int(keyfilename[20:22]),\
-                                        int(re.search("[0-9]{2}", line)[0]))
-                    return line, str(day)
-    else:
-        # Program will crash here.
-        print(f"Label format not recognised {label}.")
+                # print(line, end="")
+                if re.search(str(date)[-2:], line[:6]):
+                    # print(line)
+                    return line
 
-def get_key_from_date(date):
-    """Return daykey of given day."""
-    keyfilename = "enigmaSchlussel" + str(date)[:7] + ".txt"
-    with open(keyfilename, "r") as infile:
-        for line in infile:
-            # print(line, end="")
-            if re.search(str(date)[-2:], line[:6]):
-                # print(line)
-                return line
+    def divide_key(self, daykey):
+        """Split daykey for use in emigma."""
+        rotors = {}
+        for r in rotorI, rotorII, rotorIII, rotorIV,\
+                rotorV, rotorVI, rotorVII, rotorVIII:
+            rotors[r[0]] = r
 
-def divide_key(daykey):
-    """Split daykey for use in emigma."""
-    rotors = {}
-    for r in rotorI, rotorII, rotorIII, rotorIV,\
-            rotorV, rotorVI, rotorVII, rotorVIII:
-        rotors[r[0]] = r
+        keyparts = daykey.split("|")
 
-    keyparts = daykey.split("|")
+        key_dayofmonth = int(keyparts[1])
 
-    key_dayofmonth = int(keyparts[1])
+        key_rotors = keyparts[2].split()
+        for k in range(len(key_rotors)):
+            key_rotors[k] = rotors[key_rotors[k]]
 
-    key_rotors = keyparts[2].split()
-    for k in range(len(key_rotors)):
-        key_rotors[k] = rotors[key_rotors[k]]
+        key_rings = keyparts[3].split()
+        for k in range(len(key_rings)):
+            key_rings[k] = int(key_rings[k])
 
-    key_rings = keyparts[3].split()
-    for k in range(len(key_rings)):
-        key_rings[k] = int(key_rings[k])
+        key_connections = keyparts[4]
+    #    print(key_connections)
+        key_connections = key_connections.lstrip().rstrip()  # .replace(" ", ".")
+    #    print(key_connections)
 
-    key_connections = keyparts[4]
-#    print(key_connections)
-    key_connections = key_connections.lstrip().rstrip()  # .replace(" ", ".")
-#    print(key_connections)
+        key_kenngruppen = keyparts[5].split()
 
-    key_kenngruppen = keyparts[5].split()
+        return key_dayofmonth,\
+            key_rotors,\
+            key_rings,\
+            key_connections,\
+            key_kenngruppen
 
-    return key_dayofmonth,\
-        key_rotors,\
-        key_rings,\
-        key_connections,\
-        key_kenngruppen
+    def clean_plain(self, s):
+        """
+        Clean plain text and prepare it for enciphering.
 
-def clean_plain(s):
-    """
-    Clean plain text and prepare it for enciphering.
+        Parameters
+        ----------
+        s : str
+            The "raw" text to be cleaned.
 
-    Parameters
-    ----------
-    s : str
-        The "raw" text to be cleaned.
+        Returns
+        -------
+        str
+            The clean text, containing only characters present
+            in the Enigma keyboard.
+        """
+        # KLAM = Parenthesis
+        # ZZ = Comma
+        # X = Full stop (end of sentence)
+        # YY = Point or dot
+        # X****X = Inverted commas
 
-    Returns
-    -------
-    str
-        The clean text, containing only characters present
-        in the Enigma keyboard.
-    """
-    # KLAM = Parenthesis
-    # ZZ = Comma
-    # X = Full stop (end of sentence)
-    # YY = Point or dot
-    # X****X = Inverted commas
+        # Question mark (Fragezeichen in German) was usually abbreviated to
+        # FRAGE, FRAGEZ or FRAQ.
+        # Foreign names, places, etc. are delimited twice by "X", as in
+        # XPARISXPARISX or XFEUERSTEINX.
+        # The letters CH were written as Q. ACHT became AQT, RICHTUNG
+        # became RIQTUNG.
 
-    # Question mark (Fragezeichen in German) was usually abbreviated to
-    # FRAGE, FRAGEZ or FRAQ.
-    # Foreign names, places, etc. are delimited twice by "X", as in
-    # XPARISXPARISX or XFEUERSTEINX.
-    # The letters CH were written as Q. ACHT became AQT, RICHTUNG
-    # became RIQTUNG.
+        # Numbers were written as NULL EINZ ZWO DREI VIER FUNF SEQS SIEBEN AQT NEUN
+        # It was prohibited to encipher the word "NULL" several times in a row,
+        # so they used CENTA (00), MILLE (000) and MYRIA (0000).
+        # Some examples: 200 = ZWO CENTA, 00780 = CENTA SIEBEN AQT NULL.
 
-    # Numbers were written as NULL EINZ ZWO DREI VIER FUNF SEQS SIEBEN AQT NEUN
-    # It was prohibited to encipher the word "NULL" several times in a row,
-    # so they used CENTA (00), MILLE (000) and MYRIA (0000).
-    # Some examples: 200 = ZWO CENTA, 00780 = CENTA SIEBEN AQT NULL.
-
-    s = s.replace("", " ").split()
-    for i, letter in enumerate(s):
-        # print(i, s[i])
-        if letter.upper() in rotor0 or letter in rotor0:
-            # Lower case letter or upper case letter
-            s[i] = letter.upper()
-        elif letter == ".":
-            s[i] = "X"
-        elif letter == ",":
-            _ = s.pop(i)
-            s.insert(i, "ZZ")
-        elif letter == "?":
-            _ = s.pop(i)
-            s.insert(i, "FRAGE")
-        elif letter == "(" or letter == ")":
-            _ = s.pop(i)
-            s.insert(i, "KLAM")
-        elif letter == "Ä" or letter == "ä":
-            _ = s.pop(i)
-            s.insert(i, "AE")
-        elif letter == "Ü" or letter == "ü":
-            _ = s.pop(i)
-            s.insert(i, "UE")
-        elif letter == "Ö" or letter == "ö":
-            _ = s.pop(i)
-            s.insert(i, "OE")
-        elif letter == "Æ" or letter == "æ":  # Støtte for norsk
-            _ = s.pop(i)
-            s.insert(i, "AE")
-        elif letter == "Ø" or letter == "ø":  # Støtte for norsk
-            _ = s.pop(i)
-            s.insert(i, "OE")
-        elif letter == "Å" or letter == "å":  # Støtte for norsk
-            _ = s.pop(i)
-            s.insert(i, "AA")
-        elif letter == "1":
-            _ = s.pop(i)
-            s.insert(i, "EINS")
-        elif letter == "2":
-            _ = s.pop(i)
-            s.insert(i, "ZWO")
-        elif letter == "3":
-            _ = s.pop(i)
-            s.insert(i, "DREI")
-        elif letter == "4":
-            _ = s.pop(i)
-            s.insert(i, "VIER")
-        elif letter == "5":
-            _ = s.pop(i)
-            s.insert(i, "FUNF")
-        elif letter == "6":
-            _ = s.pop(i)
-            s.insert(i, "SECHS")
-        elif letter == "7":
-            _ = s.pop(i)
-            s.insert(i, "SIEBEN")
-        elif letter == "8":
-            _ = s.pop(i)
-            s.insert(i, "ACHT")
-        elif letter == "9":
-            _ = s.pop(i)
-            s.insert(i, "NEUN")
-        elif letter == "0":  # Not convinced this is the most elegant.
-            if i + 1 < len(s):
-                if s[i + 1] != "0":
-                    _ = s.pop(i)
-                    s.insert(i, "NULL")
-                elif i + 2 < len(s) and s[i + 1] == "0":
-                    if s[i + 2] != "0":
+        s = s.replace("", " ").split()
+        for i, letter in enumerate(s):
+            # print(i, s[i])
+            if letter.upper() in rotor0 or letter in rotor0:
+                # Lower case letter or upper case letter
+                s[i] = letter.upper()
+            elif letter == ".":
+                s[i] = "X"
+            elif letter == ",":
+                _ = s.pop(i)
+                s.insert(i, "ZZ")
+            elif letter == "?":
+                _ = s.pop(i)
+                s.insert(i, "FRAGE")
+            elif letter == "(" or letter == ")":
+                _ = s.pop(i)
+                s.insert(i, "KLAM")
+            elif letter == "Ä" or letter == "ä":
+                _ = s.pop(i)
+                s.insert(i, "AE")
+            elif letter == "Ü" or letter == "ü":
+                _ = s.pop(i)
+                s.insert(i, "UE")
+            elif letter == "Ö" or letter == "ö":
+                _ = s.pop(i)
+                s.insert(i, "OE")
+            elif letter == "Æ" or letter == "æ":  # Støtte for norsk
+                _ = s.pop(i)
+                s.insert(i, "AE")
+            elif letter == "Ø" or letter == "ø":  # Støtte for norsk
+                _ = s.pop(i)
+                s.insert(i, "OE")
+            elif letter == "Å" or letter == "å":  # Støtte for norsk
+                _ = s.pop(i)
+                s.insert(i, "AA")
+            elif letter == "1":
+                _ = s.pop(i)
+                s.insert(i, "EINS")
+            elif letter == "2":
+                _ = s.pop(i)
+                s.insert(i, "ZWO")
+            elif letter == "3":
+                _ = s.pop(i)
+                s.insert(i, "DREI")
+            elif letter == "4":
+                _ = s.pop(i)
+                s.insert(i, "VIER")
+            elif letter == "5":
+                _ = s.pop(i)
+                s.insert(i, "FUNF")
+            elif letter == "6":
+                _ = s.pop(i)
+                s.insert(i, "SECHS")
+            elif letter == "7":
+                _ = s.pop(i)
+                s.insert(i, "SIEBEN")
+            elif letter == "8":
+                _ = s.pop(i)
+                s.insert(i, "ACHT")
+            elif letter == "9":
+                _ = s.pop(i)
+                s.insert(i, "NEUN")
+            elif letter == "0":  # Not convinced this is the most elegant.
+                if i + 1 < len(s):
+                    if s[i + 1] != "0":
                         _ = s.pop(i)
-                        _ = s.pop(i)
-                        s.insert(i, "CENTA")
-                    elif i + 3 < len(s) and s[i + 2] == "0":
-                        if s[i + 3] != "0":
+                        s.insert(i, "NULL")
+                    elif i + 2 < len(s) and s[i + 1] == "0":
+                        if s[i + 2] != "0":
+                            _ = s.pop(i)
+                            _ = s.pop(i)
+                            s.insert(i, "CENTA")
+                        elif i + 3 < len(s) and s[i + 2] == "0":
+                            if s[i + 3] != "0":
+                                _ = s.pop(i)
+                                _ = s.pop(i)
+                                _ = s.pop(i)
+                                s.insert(i, "MILLE")
+                            elif s[i + 3] == "0":
+                                _ = s.pop(i)
+                                _ = s.pop(i)
+                                _ = s.pop(i)
+                                _ = s.pop(i)
+                                s.insert(i, "MYRIAD")
+                        else:
                             _ = s.pop(i)
                             _ = s.pop(i)
                             _ = s.pop(i)
                             s.insert(i, "MILLE")
-                        elif s[i + 3] == "0":
-                            _ = s.pop(i)
-                            _ = s.pop(i)
-                            _ = s.pop(i)
-                            _ = s.pop(i)
-                            s.insert(i, "MYRIAD")
                     else:
                         _ = s.pop(i)
                         _ = s.pop(i)
-                        _ = s.pop(i)
-                        s.insert(i, "MILLE")
+                        s.insert(i, "CENTA")
                 else:
                     _ = s.pop(i)
-                    _ = s.pop(i)
-                    s.insert(i, "CENTA")
+                    s.insert(i, "NULL")
             else:
-                _ = s.pop(i)
-                s.insert(i, "NULL")
-        else:
-            # Discard all else
-            print(f"Character not allowed. Discarded character: {s[i]}")
-            s[i] = ""
+                # Discard all else
+                print(f"Character not allowed. Discarded character: {s[i]}")
+                s[i] = ""
 
-    return "".join(s)
+        return "".join(s)
 
-def format_in_groups(s, group=5):
-    """Format the cipher text in groups for transmission."""
-    # Adds a space every five characters or so.
-    return " ".join(s[i: i + group] for i in range(0, len(s), group))
+    def format_in_groups(self, s, group=5):
+        """Format the cipher text in groups for transmission."""
+        # Adds a space every five characters or so.
+        return " ".join(s[i: i + group] for i in range(0, len(s), group))
+
+def printable_key(key):
+    """Return string to print the daykey nicely."""
+    # TODO: Make class Key()
+    return key[0][0][0] + " " + key[0][1][0] + " " + key[0][2][0] + "  "\
+         + key[2][0] + " "    + key[2][1] + " "    + key[2][2] + "  "\
+     + str(key[3][0]) +" "+ str(key[3][1]) +" "+ str(key[3][2]) + "  "\
+         + key[4]
 
 class Enigma_M3():
     """Emulates the Enigma M3 machine.
