@@ -4,14 +4,11 @@ Created on Tue Feb 11 21:38:41 2020
 
 @author: jsg
 """
-import secrets
-import re
 import datetime
-
-### 2020-05-01: Rewriting with enig_op and enigma_M3 as objects, not functions.
+import re
+import secrets
 
 # Hard wiring of the rotors
-
 # Eintrittwaltze does not affect cryptation in military models.
 # rotor0 is also being used as a shorthand for the plain alphabet.
 rotor0 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
@@ -33,46 +30,17 @@ reflC = ["C", "FVPJIAOYEDRZXWGCTKUQSBNMHL"]
 
 def main():
     """Execute enigma program."""
-    to = "F"  # May not match regexp [A-Z]{5}
+    recipient = "F"  # May not match regexp [A-Z]{5}
     sender = "Q"  # May not match regexp [A-Z]{5}
-#    message = "F Q 2128 = 30 = FTK SAZ\nSQYNB ADEGL JLWLT VSTPM BXYTN IBHOT"
-#    message = "F Q 1944 = 30 = FPQ IBD\nMZQRE FMKSW BBMEW GIPUN XQOFC ZYLYR"
-    # message = "Nå begynner vi å nærme oss. Men først må vi teste om vi kan \
-    # sende en kjempelang melding, en som ikke får plass i en SMS, så den må \
-    # deles opp i flere deler, så den ikke bryter med de kryptografiske \
-    # reglene for enigma. Hvis vi skal få sjekket skikkelig må vi skrive enda \
-    # litt til, kanskje helt ut hit."
-#    message = "F Q 2143 = 14 = FGH ZAS\nDQLOP NWSSD LFBB"
-# message = "F Q 1230  = 250 = WZA UHL FDJKM LDAHH YEOEF PTWYB LENDP MKOXL "\
-#     + "DFAMU DWIJD XRJZY DFRIO MFTEV KTGUY DDZED TPOQX FDRIU CCBFM MQWYE "\
-#     + "FIPUL WSXHG YHJZE AOFDU FUTEC VVBDP OLZLG DEJTI HGYER DCXCV BHSEE "\
-#     + "TTKJK XAAQU GTTUO FCXZH IDREF TGHSZ DERFG EDZZS ERDET RFGTT RREOM "\
-#     + "MJMED EDDER FTGRE UUHKD DLEFG FGREZ ZZSEU YYRGD EDFED HJUIK FXNVB"\
     message = "Skal vi se, da, funker det?"
     message = "F Q 2115 = 33 = HXA QLQ "\
               + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
 
-    enig_op(message, recipient=to, sender=sender, encipher=False, month=None)
+    encipher = False
+    month = None
 
-def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
-    """Emulates the operator of the Enigma M3.
-
-    Args:
-        message (str):
-            Message to be enciphered or deciphered.
-        recipient (str, optional):
-            The intended recipient's code name. Defaults to None.
-        sender (str, optional):
-            The sender's code name. Defaults to None.
-        encipher (bool, optional):
-            Enciphers if True, deciphers if False. Defaults to False.
-        month (string yyyy-mm, optional):
-            Month in which to look for key, this month assumed if None.
-            Defaults to None.
-
-    Return: Returns nothing, but prints the result to terminal.
-    """
-    verbose = True  # For debugging
+    op = Operator()
+    verbose = False  # For debugging
     if encipher:  # Encipher message
         time = str(datetime.datetime.now().time().strftime("%H%M"))
         date = str(datetime.date.today())
@@ -120,7 +88,7 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
                    key_rings,
                    key_connections]
             enigma = Enigma_M3(key)
-            cipher = enigma.encipher(parts[n], verbose=verbose)  # , verbose=verbose)
+            cipher = enigma.encipher(parts[n], verbose=verbose)
             # print(f"{cipher=}")
             # Format output
             # start of message is
@@ -138,7 +106,6 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
             print(str(date), end="  ")
             print(printable_key(key))
             print(ciphertext)
-
     elif not encipher:  # Decipher
         # Find recipient
         recipient = re.findall("[A-Z]+ ", message)[0]
@@ -188,6 +155,29 @@ def enig_op(message, recipient=None, sender=None, encipher=True, month=None):
         preplain = "Til " + recipient + "fra " + sender \
             + str(date) + " " + time + "\n"
         print(preplain + plain)
+
+    # operator(message, recipient=to, sender=sender, encipher=False, month=None)
+
+class Operator():
+    # message, recipient=None, sender=None, encipher=True, month=None):
+    """Emulates the operator of the Enigma M3.
+
+    Args:
+        message (str):
+            Message to be enciphered or deciphered.
+        recipient (str, optional):
+            The intended recipient's code name. Defaults to None.
+        sender (str, optional):
+            The sender's code name. Defaults to None.
+        encipher (bool, optional):
+            Enciphers if True, deciphers if False. Defaults to False.
+        month (string yyyy-mm, optional):
+            Month in which to look for key, this month assumed if None.
+            Defaults to None.
+
+    Return: Returns nothing, but prints the result to terminal.
+    """
+
 
 def printable_key(key):
     """Return string to print the daykey nicely."""
