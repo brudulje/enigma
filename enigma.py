@@ -259,14 +259,14 @@ class Operator():
             else:
                 # Using specified month
                 day = datetime.date(month[:4], month[-2:], label)
-            keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
-            with open(keyfilename, "r") as infile:
-                for line in infile:
-                    # print(line, end="")
-                    if re.search(str(day)[-2:], line[:6]):
-                        # print(line)
-                        return Key(line), str(day)
-            # return self.get_key_from_date(day), str(day)
+            # keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
+            # with open(keyfilename, "r") as infile:
+            #     for line in infile:
+            #         # print(line, end="")
+            #         if re.search(str(day)[-2:], line[:6]):
+            #             # print(line)
+            #             return Key(line), str(day)
+            return self.get_key_from_date(day), str(day)
 
         elif re.match("[A-Z]{3}", label):
             # Label is a kenngruppe.
@@ -276,19 +276,20 @@ class Operator():
             else:
                 # Using specified month
                 day = datetime.date(month[:4], month[-2:], 1)
-            keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
-            # print("Sure")
-            with open(keyfilename, "r") as infile:
-                for line in infile:
-                    if re.search(str(label), line):
-                        # Correct the date to show the date on which
-                        # the key was valid.
-                        day = datetime.date(int(keyfilename[15:19]),\
-                                            int(keyfilename[20:22]),\
-                                            int(re.search("[0-9]{2}",\
-                                                          line)[0]))
-                        # print("yeah")
-                        return Key(line), str(day)
+            return self.get_key_from_kenngruppe(day, label), str(day)
+            # keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
+            # # print("Sure")
+            # with open(keyfilename, "r") as infile:
+            #     for line in infile:
+            #         if re.search(str(label), line):
+            #             # Correct the date to show the date on which
+            #             # the key was valid.
+            #             day = datetime.date(int(keyfilename[15:19]),\
+            #                                 int(keyfilename[20:22]),\
+            #                                 int(re.search("[0-9]{2}",\
+            #                                               line)[0]))
+            #             # print("yeah")
+            #             return Key(line), str(day)
         else:
             # Program will crash here.
             raise ValueError(f"Invalid input {label=}.")
@@ -296,13 +297,29 @@ class Operator():
 
     def get_key_from_date(self, date):
         """Return daykey of given day."""
-        # TODO: See if this method should not be removed.
+        # TODO: See if this method should not be removed. No, keep it.
         keyfilename = "enigmaSchlussel" + str(date)[:7] + ".txt"
         with open(keyfilename, "r") as infile:
             for line in infile:
                 # print(line, end="")
                 if re.search(str(date)[-2:], line[:6]):
                     # print(line)
+                    return Key(line)
+
+    def get_key_from_kenngruppe(self, day, kenn):
+        """Return daykey of given kenngruppe."""
+        keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
+        # print("Sure")
+        with open(keyfilename, "r") as infile:
+            for line in infile:
+                if re.search(str(kenn), line):
+                    # Correct the date to show the date on which
+                    # the key was valid.
+                    day = datetime.date(int(keyfilename[15:19]),\
+                                        int(keyfilename[20:22]),\
+                                        int(re.search("[0-9]{2}",\
+                                                      line)[0]))
+                    print("Yepp")
                     return Key(line)
 
     def divide_key(self, daykey):
