@@ -33,9 +33,10 @@ def main():
     recipient = "F"  # May not match regexp [A-Z]{5}
     sender = "Q"  # May not match regexp [A-Z]{5}
     message = "Skal vi se, da, funker det?"
-    message = "F Q 2115 = 33 = HXA QLQ "\
-              + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
-
+    # message = "F Q 2115 = 33 = HXA QLQ "\
+    #     + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
+    message = "F Q 2001 = 33 = YZW OYC "\
+        + "GWYNB HLUVT ALIID ATVLK ROZYA VJKXW RED"
     encipher = False
     month = None
 
@@ -86,10 +87,10 @@ class Operator():
         # Date to know which key to use.
         date = str(datetime.date.today())
         # print(date)
-        daykey, _ = self.get_daykey(date)
-        # print(daykey)
-        key_dayofmonth, key_rotors, key_rings, \
-            key_connections, key_kenngruppen = self.divide_key(daykey)
+        key, _ = self.get_daykey(date)
+        print(f"{key=}")
+        # key_dayofmonth, key_rotors, key_rings, \
+        #     key_connections, key_kenngruppen = self.divide_key(daykey)
 
         # Clean plain
         print(message)
@@ -103,30 +104,32 @@ class Operator():
             msg_start = ''.join(secrets.choice(rotor0) for i in range(3))
             msg_start_list = msg_start.replace("", " ").split()
 
+            key.starts = msg_start_list
+            # encipher message key using message start pos
+            # key = [key_rotors,
+            #        [reflB],
+            #        msg_start_list,
+            #        key_rings,
+            #        key_connections]
+            # Should make enigma_M3 object, then run the encipher method.
+            enigma = Enigma_M3(key)
+
             # choose random message key (3 letters)
             msg_key = ''.join(secrets.choice(rotor0) for i in range(3))
             msg_key_list = msg_key.replace("", " ").split()
-
-            # encipher message key using message start pos
-            key = [key_rotors,
-                   [reflB],
-                   msg_start_list,
-                   key_rings,
-                   key_connections]
-            # Should make enigma_M3 object, then run the encipher method.
-            enigma = Enigma_M3(key)
             enc_msg_key = enigma.process(msg_key, verbose=verbose)
+            key.starts = msg_key_list
             # print(f"{enc_msg_key=}")
             # make buchstabenkenngruppen
             letterIDgroup = ''.join(secrets.choice(rotor0) for i in range(2)) \
-                            + secrets.choice(key_kenngruppen)
+                            + secrets.choice(key.kenns)
             # print(f"{letterIDgroup=}")
             # Encipher message
-            key = [key_rotors,
-                   [reflB],
-                   msg_key_list,
-                   key_rings,
-                   key_connections]
+            # key = [key_rotors,
+            #        [reflB],
+            #        msg_key_list,
+            #        key_rings,
+            #        key_connections]
             enigma = Enigma_M3(key)
             cipher = enigma.process(parts[n], verbose=verbose)
             # print(f"{cipher=}")
@@ -144,7 +147,8 @@ class Operator():
             cipher = self.format_in_groups(cipher)
             ciphertext = precipher + cipher
             print(str(date), end="  ")
-            print(printable_key(key))
+            # print(printable_key(key))
+            print(key)
             # print(ciphertext)
             return ciphertext
 
@@ -190,12 +194,14 @@ class Operator():
         kenngruppen = re.search("[A-Z]{5} ", message)[0][2:-1]
 
         # Look up key in book
-        daykey, date = self.get_daykey(kenngruppen, month=month)
-        key_dayofmonth, key_rotors, key_rings, \
-            key_connections, key_kenngruppen = self.divide_key(daykey)
+        key, date = self.get_daykey(kenngruppen, month=month)
+        key.starts = msg_start_list
+        print(f"{key=}")
+        # key_dayofmonth, key_rotors, key_rings, \
+        #     key_connections, key_kenngruppen = self.divide_key(daykey)
 
         # Decipher message key
-        key = [key_rotors, [reflB], msg_start_list, key_rings, key_connections]
+        # key = [key_rotors, [reflB], msg_start_list, key_rings, key_connections]
         enigma = Enigma_M3(key)
         msg_key = enigma.process(enc_msg_key, verbose=verbose)
         # print(f"{msg_key=}")
@@ -207,12 +213,14 @@ class Operator():
 
         # Decipher message.
         print(message)
-        key = [key_rotors, [reflB], msg_key_list, key_rings, key_connections]
+        # key = [key_rotors, [reflB], msg_key_list, key_rings, key_connections]
+        key.starts = msg_key_list
         enigma = Enigma_M3(key)
         plain = enigma.process(cipher, verbose=verbose)
         plain.lower()
         print(str(date), end="  ")
-        print(printable_key(key))
+        # print(printable_key(key))
+        print(key)
         preplain = "Til " + recipient + "fra " + sender \
             + str(date) + " " + time + "\n"
         # print(preplain + plain)
@@ -231,6 +239,7 @@ class Operator():
                yyyy-mm: explicit month to use to look for key
 
         Return:
+            TODO Should return a Key object
             (str) daykey matching label
                 "| 31 | I II V | 06 22 14 | PO ML IU KJ NH YT GB VF RE DC
                 | EXS TGY IKJ LOP |"
@@ -256,7 +265,7 @@ class Operator():
                     # print(line, end="")
                     if re.search(str(day)[-2:], line[:6]):
                         # print(line)
-                        return line
+                        return Key(line), str(day)
             # return self.get_key_from_date(day), str(day)
 
         elif re.match("[A-Z]{3}", label):
@@ -278,25 +287,27 @@ class Operator():
                                             int(keyfilename[20:22]),\
                                             int(re.search("[0-9]{2}",\
                                                           line)[0]))
-                        print("yeah")
-                        return line, str(day)
+                        # print("yeah")
+                        return Key(line), str(day)
         else:
             # Program will crash here.
             raise ValueError(f"Invalid input {label=}.")
             # print(f"Label format not recognised {label}.")
 
-    # def get_key_from_date(self, date):
-    #     """Return daykey of given day."""
-    #     keyfilename = "enigmaSchlussel" + str(date)[:7] + ".txt"
-    #     with open(keyfilename, "r") as infile:
-    #         for line in infile:
-    #             # print(line, end="")
-    #             if re.search(str(date)[-2:], line[:6]):
-    #                 # print(line)
-    #                 return line
+    def get_key_from_date(self, date):
+        """Return daykey of given day."""
+        # TODO: See if this method should not be removed.
+        keyfilename = "enigmaSchlussel" + str(date)[:7] + ".txt"
+        with open(keyfilename, "r") as infile:
+            for line in infile:
+                # print(line, end="")
+                if re.search(str(date)[-2:], line[:6]):
+                    # print(line)
+                    return Key(line)
 
     def divide_key(self, daykey):
         """Split daykey for use in emigma."""
+        # TODO: Make this part of Key.__init__()
         rotors = {}
         for r in rotorI, rotorII, rotorIII, rotorIV,\
                 rotorV, rotorVI, rotorVII, rotorVIII:
@@ -472,15 +483,76 @@ class Operator():
 
 
 class Key():
-    """Reprecents the key."""
+    """Represents the key."""
+
+    def __init__(self, keytext):  # rotors, refl, starts, rings, plugs, kenns):
+        """
+
+        keytext : str
+            Line from code book containing daykey.
+        """
+
+        rotors = {}
+        for r in rotorI, rotorII, rotorIII, rotorIV,\
+                rotorV, rotorVI, rotorVII, rotorVIII:
+            rotors[r[0]] = r
+
+        keyparts = keytext.split("|")
+
+        self.dayofmonth = int(keyparts[1])
+
+        self.rotors = keyparts[2].split()
+        for k in range(len(self.rotors)):
+            self.rotors[k] = rotors[self.rotors[k]]
+
+        self.rings = keyparts[3].split()
+        for k in range(len(self.rings)):
+            self.rings[k] = int(self.rings[k])
+
+        # key_connections = keyparts[4]
+        self.plugs = keyparts[4]
+    #    print(key_connections)
+        self.plugs = self.plugs.lstrip().rstrip()
+        # .replace(" ", ".")
+    #    print(key_connections)
+
+        # key_kenngruppen = keyparts[5].split()
+        self.kenns = keyparts[5].split()
+        # return key_dayofmonth,\
+        #     key_rotors,\
+        #     key_rings,\
+        #     key_connections,\
+        #     key_kenngruppen
+        # self.rotors = rotors
+        self.refl = reflB
+        self.starts = []
+        # self.rings = rings
+        # self.plugs = plugs
+        # self.kenns = kenns
+
+    def __str__(self):
+        """Return string to print the daykey nicely."""
+        s = self.rotors[0][0] + " " \
+            + self.rotors[1][0] + " " \
+            + self.rotors[2][0] + "  "
+        if self.starts is not None:
+            s = s + self.starts[0] + " "\
+                + self.starts[1] + " "\
+                + self.starts[2] + "  "
+        s = s + str(self.rings[0]) + " " \
+            + str(self.rings[1]) + " " \
+            + str(self.rings[2]) + "  " \
+            + self.plugs
+        return s
 
 # def printable_key(key):
 #     """Return string to print the daykey nicely."""
-#     # TODO: Make class Key()
+#     # TODO: Make this the __str__ of class Key()
+
 #     return key[0][0][0] + " " + key[0][1][0] + " " + key[0][2][0] + "  "\
-#          + key[2][0] + " "    + key[2][1] + " "    + key[2][2] + "  "\
-#      + str(key[3][0]) +" "+ str(key[3][1]) +" "+ str(key[3][2]) + "  "\
-#          + key[4]
+#           + key[2][0] + " "    + key[2][1] + " "    + key[2][2] + "  "\
+#       + str(key[3][0]) +" "+ str(key[3][1]) +" "+ str(key[3][2]) + "  "\
+#           + key[4]
 
 
 class Enigma_M3():
@@ -545,11 +617,11 @@ class Enigma_M3():
         # Make the number of active rotors adjustable.
 
         # Setting up the hardware
-        self.lft = Rotor(key[0][0], key[2][0], key[3][0])
-        self.mid = Rotor(key[0][1], key[2][1], key[3][1])
-        self.rgt = Rotor(key[0][2], key[2][2], key[3][2])
-        self.ref = Reflector(key[1][0])
-        self.plg = Plugboard(key[4])
+        self.lft = Rotor(key.rotors[0], key.starts[0], key.rings[0])
+        self.mid = Rotor(key.rotors[1], key.starts[1], key.rings[1])
+        self.rgt = Rotor(key.rotors[2], key.starts[2], key.rings[2])
+        self.ref = Reflector(key.refl)
+        self.plg = Plugboard(key.plugs)
 
     def process(self, text, verbose=False):
         """
