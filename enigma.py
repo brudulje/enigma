@@ -250,10 +250,17 @@ class Operator():
             else:
                 # Using specified month
                 day = datetime.date(month[:4], month[-2:], label)
-            return self.get_key_from_date(day), str(day)
+            keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
+            with open(keyfilename, "r") as infile:
+                for line in infile:
+                    # print(line, end="")
+                    if re.search(str(day)[-2:], line[:6]):
+                        # print(line)
+                        return line
+            # return self.get_key_from_date(day), str(day)
 
         elif re.match("[A-Z]{3}", label):
-            # Label is a kenngruppe, assuming from this month
+            # Label is a kenngruppe.
             if month is None:
                 # Assuming current month
                 day = datetime.date.today()
@@ -261,6 +268,7 @@ class Operator():
                 # Using specified month
                 day = datetime.date(month[:4], month[-2:], 1)
             keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
+            # print("Sure")
             with open(keyfilename, "r") as infile:
                 for line in infile:
                     if re.search(str(label), line):
@@ -270,21 +278,22 @@ class Operator():
                                             int(keyfilename[20:22]),\
                                             int(re.search("[0-9]{2}",\
                                                           line)[0]))
+                        print("yeah")
                         return line, str(day)
         else:
             # Program will crash here.
             raise ValueError(f"Invalid input {label=}.")
             # print(f"Label format not recognised {label}.")
 
-    def get_key_from_date(self, date):
-        """Return daykey of given day."""
-        keyfilename = "enigmaSchlussel" + str(date)[:7] + ".txt"
-        with open(keyfilename, "r") as infile:
-            for line in infile:
-                # print(line, end="")
-                if re.search(str(date)[-2:], line[:6]):
-                    # print(line)
-                    return line
+    # def get_key_from_date(self, date):
+    #     """Return daykey of given day."""
+    #     keyfilename = "enigmaSchlussel" + str(date)[:7] + ".txt"
+    #     with open(keyfilename, "r") as infile:
+    #         for line in infile:
+    #             # print(line, end="")
+    #             if re.search(str(date)[-2:], line[:6]):
+    #                 # print(line)
+    #                 return line
 
     def divide_key(self, daykey):
         """Split daykey for use in emigma."""
@@ -462,13 +471,16 @@ class Operator():
         return " ".join(s[i: i + group] for i in range(0, len(s), group))
 
 
-def printable_key(key):
-    """Return string to print the daykey nicely."""
-    # TODO: Make class Key()
-    return key[0][0][0] + " " + key[0][1][0] + " " + key[0][2][0] + "  "\
-         + key[2][0] + " "    + key[2][1] + " "    + key[2][2] + "  "\
-     + str(key[3][0]) +" "+ str(key[3][1]) +" "+ str(key[3][2]) + "  "\
-         + key[4]
+class Key():
+    """Reprecents the key."""
+
+# def printable_key(key):
+#     """Return string to print the daykey nicely."""
+#     # TODO: Make class Key()
+#     return key[0][0][0] + " " + key[0][1][0] + " " + key[0][2][0] + "  "\
+#          + key[2][0] + " "    + key[2][1] + " "    + key[2][2] + "  "\
+#      + str(key[3][0]) +" "+ str(key[3][1]) +" "+ str(key[3][2]) + "  "\
+#          + key[4]
 
 
 class Enigma_M3():
