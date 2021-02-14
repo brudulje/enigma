@@ -42,57 +42,13 @@ def main():
     op = Operator()
     verbose = False  # For debugging
     if encipher:  # Encipher message
-        op.encipher(message, recipient=recipient, sender=sender, month=month)
+        op.encipher(message,
+                    recipient=recipient,
+                    sender=sender,
+                    month=month,
+                    verbose=verbose)
     elif not encipher:  # Decipher
-        # Find recipient
-        recipient = re.findall("[A-Z]+ ", message)[0]
-
-        # Find sender
-        sender = re.findall("[A-Z]+ ", message)[1]
-
-        # Find time
-        time = re.search("[0-9]{4}", message)[0]
-        time = time[:2] + ":" + time[-2:]
-
-        # Find message start pos
-        # Find enciphered message key
-        tla = re.findall("(?=( [A-Z]{3}[\s]))", message)  # ThreeLetterAcronym
-        # print(f"{tla=}")
-        msg_start = tla[0][1:-1]
-        enc_msg_key = tla[1][1:-1]
-        msg_start_list = msg_start.replace("", " ").split()
-
-        # Find kenngruppen
-        kenngruppen = re.search("[A-Z]{5} ", message)[0][2:-1]
-
-        # Look up key in book
-        daykey, date = op.get_daykey(kenngruppen, month=month)
-        key_dayofmonth, key_rotors, key_rings, \
-            key_connections, key_kenngruppen = op.divide_key(daykey)
-
-        # Decipher message key
-        key = [key_rotors, [reflB], msg_start_list, key_rings, key_connections]
-        enigma = Enigma_M3(key)
-        msg_key = enigma.process(enc_msg_key, verbose=verbose)
-        # print(f"{msg_key=}")
-        msg_key_list = msg_key.replace("", " ").split()
-
-        # Get the actual message, i.e. after the 5 letter kenngruppen
-        cipher = message.partition(kenngruppen)[-1].replace(" ", "")
-        # print(f"{cipher=}")
-
-        # Decipher message.
-        print(message)
-        key = [key_rotors, [reflB], msg_key_list, key_rings, key_connections]
-        enigma = Enigma_M3(key)
-        plain = enigma.process(cipher, verbose=verbose)
-        plain.lower()
-        print(str(date), end="  ")
-        print(printable_key(key))
-        preplain = "Til " + recipient + "fra " + sender \
-            + str(date) + " " + time + "\n"
-        print(preplain + plain)
-
+        op.decipher(message, verbose=verbose)
 
 class Operator():
     # message, recipient=None, sender=None, encipher=True, month=None):
@@ -181,6 +137,57 @@ class Operator():
             print(str(date), end="  ")
             print(printable_key(key))
             print(ciphertext)
+
+    def decipher(self, message, month=None, verbose=False):
+        # Find recipient
+        recipient = re.findall("[A-Z]+ ", message)[0]
+
+        # Find sender
+        sender = re.findall("[A-Z]+ ", message)[1]
+
+        # Find time
+        time = re.search("[0-9]{4}", message)[0]
+        time = time[:2] + ":" + time[-2:]
+
+        # Find message start pos
+        # Find enciphered message key
+        tla = re.findall("(?=( [A-Z]{3}[\s]))", message)  # ThreeLetterAcronym
+        # print(f"{tla=}")
+        msg_start = tla[0][1:-1]
+        enc_msg_key = tla[1][1:-1]
+        msg_start_list = msg_start.replace("", " ").split()
+
+        # Find kenngruppen
+        kenngruppen = re.search("[A-Z]{5} ", message)[0][2:-1]
+
+        # Look up key in book
+        daykey, date = self.get_daykey(kenngruppen, month=month)
+        key_dayofmonth, key_rotors, key_rings, \
+            key_connections, key_kenngruppen = self.divide_key(daykey)
+
+        # Decipher message key
+        key = [key_rotors, [reflB], msg_start_list, key_rings, key_connections]
+        enigma = Enigma_M3(key)
+        msg_key = enigma.process(enc_msg_key, verbose=verbose)
+        # print(f"{msg_key=}")
+        msg_key_list = msg_key.replace("", " ").split()
+
+        # Get the actual message, i.e. after the 5 letter kenngruppen
+        cipher = message.partition(kenngruppen)[-1].replace(" ", "")
+        # print(f"{cipher=}")
+
+        # Decipher message.
+        print(message)
+        key = [key_rotors, [reflB], msg_key_list, key_rings, key_connections]
+        enigma = Enigma_M3(key)
+        plain = enigma.process(cipher, verbose=verbose)
+        plain.lower()
+        print(str(date), end="  ")
+        print(printable_key(key))
+        preplain = "Til " + recipient + "fra " + sender \
+            + str(date) + " " + time + "\n"
+        print(preplain + plain)
+
 
     def get_daykey(self, label, month=None):
         """Return the daykey for the given date or kenngruppen.
