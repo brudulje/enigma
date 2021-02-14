@@ -42,69 +42,7 @@ def main():
     op = Operator()
     verbose = False  # For debugging
     if encipher:  # Encipher message
-        time = str(datetime.datetime.now().time().strftime("%H%M"))
-        date = str(datetime.date.today())
-        # print(date)
-        daykey, _ = op.get_daykey(date)
-        # print(daykey)
-        key_dayofmonth, key_rotors, key_rings, \
-            key_connections, key_kenngruppen = op.divide_key(daykey)
-
-        # Clean plain
-        print(message)
-        plaintext = op.clean_plain(message)
-        maxlength = 245
-        parts = [plaintext[i: i + maxlength] \
-                 for i in range(0, len(plaintext), maxlength)]
-
-        for n in range(len(parts)):
-            # choose random message start pos (3 letters)
-            msg_start = ''.join(secrets.choice(rotor0) for i in range(3))
-            msg_start_list = msg_start.replace("", " ").split()
-
-            # choose random message key (3 letters)
-            msg_key = ''.join(secrets.choice(rotor0) for i in range(3))
-            msg_key_list = msg_key.replace("", " ").split()
-
-            # encipher message key using message start pos
-            key = [key_rotors,
-                   [reflB],
-                   msg_start_list,
-                   key_rings,
-                   key_connections]
-            # Should make enigma_M3 object, then run the encipher method.
-            enigma = Enigma_M3(key)
-            enc_msg_key = enigma.encipher(msg_key, verbose=verbose)
-            # print(f"{enc_msg_key=}")
-            # make buchstabenkenngruppen
-            letterIDgroup = ''.join(secrets.choice(rotor0) for i in range(2)) \
-                            + secrets.choice(key_kenngruppen)
-            # print(f"{letterIDgroup=}")
-            # Encipher message
-            key = [key_rotors,
-                   [reflB],
-                   msg_key_list,
-                   key_rings,
-                   key_connections]
-            enigma = Enigma_M3(key)
-            cipher = enigma.encipher(parts[n], verbose=verbose)
-            # print(f"{cipher=}")
-            # Format output
-            # start of message is
-            # To: From: Clock: Lettercount: Start pos: Enciphered message key:
-            # Fiveletter group containing two random letters
-            # and the 3 letter kenngruppe
-            lettercount = len(cipher) + len(letterIDgroup)
-            precipher = str(recipient) + " " + str(sender) + " " + str(time)\
-                + " = " + str(lettercount) + " = " \
-                + msg_start + " " + enc_msg_key + "\n" + letterIDgroup + " "
-
-            # # Enciphered message
-            cipher = op.format_in_groups(cipher)
-            ciphertext = precipher + cipher
-            print(str(date), end="  ")
-            print(printable_key(key))
-            print(ciphertext)
+        op.encipher(message, recipient=recipient, sender=sender, month=month)
     elif not encipher:  # Decipher
         # Find recipient
         recipient = re.findall("[A-Z]+ ", message)[0]
@@ -135,7 +73,7 @@ def main():
         # Decipher message key
         key = [key_rotors, [reflB], msg_start_list, key_rings, key_connections]
         enigma = Enigma_M3(key)
-        msg_key = enigma.encipher(enc_msg_key, verbose=verbose)
+        msg_key = enigma.process(enc_msg_key, verbose=verbose)
         # print(f"{msg_key=}")
         msg_key_list = msg_key.replace("", " ").split()
 
@@ -147,7 +85,7 @@ def main():
         print(message)
         key = [key_rotors, [reflB], msg_key_list, key_rings, key_connections]
         enigma = Enigma_M3(key)
-        plain = enigma.encipher(cipher, verbose=verbose)
+        plain = enigma.process(cipher, verbose=verbose)
         plain.lower()
         print(str(date), end="  ")
         print(printable_key(key))
@@ -178,6 +116,71 @@ class Operator():
 
     def __init__(self):
         pass
+
+    def encipher(self, message, recipient=None, sender=None, month=None, verbose=False):
+        time = str(datetime.datetime.now().time().strftime("%H%M"))
+        date = str(datetime.date.today())
+        # print(date)
+        daykey, _ = self.get_daykey(date)
+        # print(daykey)
+        key_dayofmonth, key_rotors, key_rings, \
+            key_connections, key_kenngruppen = self.divide_key(daykey)
+
+        # Clean plain
+        print(message)
+        plaintext = self.clean_plain(message)
+        maxlength = 245
+        parts = [plaintext[i: i + maxlength] \
+                 for i in range(0, len(plaintext), maxlength)]
+
+        for n in range(len(parts)):
+            # choose random message start pos (3 letters)
+            msg_start = ''.join(secrets.choice(rotor0) for i in range(3))
+            msg_start_list = msg_start.replace("", " ").split()
+
+            # choose random message key (3 letters)
+            msg_key = ''.join(secrets.choice(rotor0) for i in range(3))
+            msg_key_list = msg_key.replace("", " ").split()
+
+            # encipher message key using message start pos
+            key = [key_rotors,
+                   [reflB],
+                   msg_start_list,
+                   key_rings,
+                   key_connections]
+            # Should make enigma_M3 object, then run the encipher method.
+            enigma = Enigma_M3(key)
+            enc_msg_key = enigma.process(msg_key, verbose=verbose)
+            # print(f"{enc_msg_key=}")
+            # make buchstabenkenngruppen
+            letterIDgroup = ''.join(secrets.choice(rotor0) for i in range(2)) \
+                            + secrets.choice(key_kenngruppen)
+            # print(f"{letterIDgroup=}")
+            # Encipher message
+            key = [key_rotors,
+                   [reflB],
+                   msg_key_list,
+                   key_rings,
+                   key_connections]
+            enigma = Enigma_M3(key)
+            cipher = enigma.process(parts[n], verbose=verbose)
+            # print(f"{cipher=}")
+            # Format output
+            # start of message is
+            # To: From: Clock: Lettercount: Start pos: Enciphered message key:
+            # Fiveletter group containing two random letters
+            # and the 3 letter kenngruppe
+            lettercount = len(cipher) + len(letterIDgroup)
+            precipher = str(recipient) + " " + str(sender) + " " + str(time)\
+                + " = " + str(lettercount) + " = " \
+                + msg_start + " " + enc_msg_key + "\n" + letterIDgroup + " "
+
+            # # Enciphered message
+            cipher = self.format_in_groups(cipher)
+            ciphertext = precipher + cipher
+            print(str(date), end="  ")
+            print(printable_key(key))
+            print(ciphertext)
 
     def get_daykey(self, label, month=None):
         """Return the daykey for the given date or kenngruppen.
@@ -495,11 +498,12 @@ class Enigma_M3():
         self.ref = Reflector(key[1][0])
         self.plg = Plugboard(key[4])
 
-    def encipher(self, text, verbose=False):
+    def process(self, text, verbose=False):
         """
-        Encipher text.
+        Encipher or decipher text.
 
         The text is enciphered (or if it is already enciphered, deciphered).
+        This method probably needs a better neam than "process".
 
         Parameters
         ----------
