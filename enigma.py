@@ -33,10 +33,10 @@ def main():
     recipient = "F"  # May not match regexp [A-Z]{5}
     sender = "Q"  # May not match regexp [A-Z]{5}
     message = "Skal vi se, da, funker det?"
-    # message = "F Q 2115 = 33 = HXA QLQ "\
-    #     + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
-    message = "F Q 2001 = 33 = YZW OYC "\
-        + "GWYNB HLUVT ALIID ATVLK ROZYA VJKXW RED"
+    message = "F Q 2115 = 33 = HXA QLQ "\
+        + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
+    # message = "F Q 2001 = 33 = YZW OYC "\
+    #     + "GWYNB HLUVT ALIID ATVLK ROZYA VJKXW RED"
     encipher = False
     month = None
 
@@ -196,7 +196,7 @@ class Operator():
         # Look up key in book
         key, date = self.get_daykey(kenngruppen, month=month)
         key.starts = msg_start_list
-        print(f"{key=}")
+        # print(f"{key=}")
         # key_dayofmonth, key_rotors, key_rings, \
         #     key_connections, key_kenngruppen = self.divide_key(daykey)
 
@@ -218,7 +218,9 @@ class Operator():
         enigma = Enigma_M3(key)
         plain = enigma.process(cipher, verbose=verbose)
         plain.lower()
+        # print("Suspecting something here...")
         print(str(date), end="  ")
+        # print("Suspecting...")
         # print(printable_key(key))
         print(key)
         preplain = "Til " + recipient + "fra " + sender \
@@ -276,7 +278,9 @@ class Operator():
             else:
                 # Using specified month
                 day = datetime.date(month[:4], month[-2:], 1)
-            return self.get_key_from_kenngruppe(day, label), str(day)
+            key, day = self.get_key_from_kenngruppe(day, label)
+            return key, day
+            # return self.get_key_from_kenngruppe(day, label), str(day)
             # keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
             # # print("Sure")
             # with open(keyfilename, "r") as infile:
@@ -319,8 +323,8 @@ class Operator():
                                         int(keyfilename[20:22]),\
                                         int(re.search("[0-9]{2}",\
                                                       line)[0]))
-                    print("Yepp")
-                    return Key(line)
+                    # print("Yepp")
+                    return Key(line), day
 
     def divide_key(self, daykey):
         """Split daykey for use in emigma."""
