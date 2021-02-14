@@ -272,9 +272,9 @@ class Operator():
                                                           line)[0]))
                         return line, str(day)
         else:
-            print(f"get_daykey got invalid input {label=}.")
             # Program will crash here.
-            print(f"Label format not recognised {label}.")
+            raise ValueError(f"Invalid input {label=}.")
+            # print(f"Label format not recognised {label}.")
 
     def get_key_from_date(self, date):
         """Return daykey of given day."""
