@@ -30,24 +30,33 @@ reflC = ["C", "FVPJIAOYEDRZXWGCTKUQSBNMHL"]
 
 def main():
     """Execute enigma program."""
-    recipient = "F"  # May not match regexp [A-Z]{5}
-    sender = "Q"  # May not match regexp [A-Z]{5}
+    recipient = "ABC"  # May not match regexp [A-Z]{5}
+    sender = "QRSTU"  # May not match regexp [A-Z]{5}
     message = "Skal vi se, da, funker det?"
-    message = "F Q 2115 = 33 = HXA QLQ "\
-        + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
+    # message = "F Q 2115 = 33 = HXA QLQ "\
+    #     + "UJCXQ FBDZJ ZLQNV OBYWY QEIVM KJDEW ZPV"
     # message = "F Q 2001 = 33 = YZW OYC "\
     #     + "GWYNB HLUVT ALIID ATVLK ROZYA VJKXW RED"
-    encipher = False
+    encipher = True
     month = None
 
     op = Operator()
     verbose = False  # For debugging
     if encipher:  # Encipher message
-        ciphertext = op.encipher(message, recipient=recipient, sender=sender,
-                                 month=month, verbose=verbose)
+        message, date, key, ciphertext = op.encipher(message,
+                                                     recipient=recipient,
+                                                     sender=sender,
+                                                     month=month,
+                                                     verbose=verbose)
+        print(message)
+        print(date, end="  ")
+        print(key)
         print(ciphertext)
     elif not encipher:  # Decipher
-        plaintext = op.decipher(message, verbose=verbose)
+        message, date, key, plaintext = op.decipher(message, verbose=verbose)
+        print(message)
+        print(date, end="  ")
+        print(key)
         print(plaintext)
 
 
@@ -57,9 +66,10 @@ class Operator():
     def __init__(self):
         pass
 
-    def encipher(self, message, recipient=None, sender=None,
+    def encipher(self, message, recipient="ABC", sender="QRS",
                  month=None, verbose=False):
         """
+        TODO: Correct docstring
         Encipher message using the enigma.
 
         Parameters
@@ -88,12 +98,12 @@ class Operator():
         date = str(datetime.date.today())
         # print(date)
         key, _ = self.get_daykey(date)
-        print(f"{key=}")
+        # print(f"{key=}")
         # key_dayofmonth, key_rotors, key_rings, \
         #     key_connections, key_kenngruppen = self.divide_key(daykey)
 
         # Clean plain
-        print(message)
+        # print(message)
         plaintext = self.clean_plain(message)
         maxlength = 245
         parts = [plaintext[i: i + maxlength] \
@@ -141,21 +151,21 @@ class Operator():
             lettercount = len(cipher) + len(letterIDgroup)
             precipher = str(recipient) + " " + str(sender) + " " + str(time)\
                 + " = " + str(lettercount) + " = " \
-                + msg_start + " " + enc_msg_key + "\n" + letterIDgroup + " "
+                + msg_start + " " + enc_msg_key + " " + letterIDgroup + " "
 
             # # Enciphered message
             cipher = self.format_in_groups(cipher)
             ciphertext = precipher + cipher
-            print(str(date), end="  ")
+            # print(str(date), end="  ")
             # print(printable_key(key))
-            print(key)
+            # print(key)
             # print(ciphertext)
-            return ciphertext
+            return message, date, key, ciphertext
 
     def decipher(self, message, month=None, verbose=False):
         """
         Decipher message.
-
+        TODO: Correct docstring
         Parameters
         ----------
         message : str
@@ -172,25 +182,65 @@ class Operator():
             The decipered text.
 
         """
+        # print(message)
+
         # Find recipient
         recipient = re.findall("[A-Z]+ ", message)[0]
+        # print(recipient)
+        message = message[len(recipient):]
+        # print(message)
 
         # Find sender
-        sender = re.findall("[A-Z]+ ", message)[1]
+        sender = re.findall("[A-Z]+ ", message)[0]
+        # print(sender)
+        message = message[len(sender):]
+        # print(message)
 
         # Find time
         time = re.search("[0-9]{4}", message)[0]
         time = time[:2] + ":" + time[-2:]
+        # print(time)
+        message = message[len(time):]
+        # print(message)
+
+        # Find message length
+        # Message length should be a number between two equal signs.
+        # The message length is not allowed to exceed 245.
+
+        length = re.search("= [0-9]+ =", message)[0]
+        messagelength = int(length[2:-2])
+        # print(messagelength)
+        message = message[len(length):]
+        # print(message)
 
         # Find message start pos
         # Find enciphered message key
         tla = re.findall("(?=( [A-Z]{3}[\s]))", message)  # ThreeLetterAcronym
         # print(f"{tla=}")
-        msg_start = tla[0][1:-1]
-        enc_msg_key = tla[1][1:-1]
+        message = message[len(tla[0]):]
+        # Subtract 1 because the space between the two tla is counted twice.
+        message = message[len(tla[1]) - 1:]
+        # print(message)
+        # print(f"{tla=}")
+        msg_start = tla[0].strip()
+        # print(f"{msg_start=}")
+        enc_msg_key = tla[1].strip()
+        # print(f"{enc_msg_key=}")
         msg_start_list = msg_start.replace("", " ").split()
 
+        # What is left of the message is what is counted in the message lenght
+        actual_message_length = len(message.replace(" ", ""))
+        if actual_message_length == messagelength:
+            # Message has correct length
+            # print(f"Message length is correct: {messagelength}.")
+            pass
+        else:
+            print("Message length is not correctly reported.\n"\
+                  + f"Should be {messagelength}, but is "\
+                  + f"{actual_message_length}!")
+
         # Find kenngruppen
+        # Kenngruppen is the last three letters in the first five-letter group.
         kenngruppen = re.search("[A-Z]{5} ", message)[0][2:-1]
 
         # Look up key in book
@@ -212,21 +262,21 @@ class Operator():
         # print(f"{cipher=}")
 
         # Decipher message.
-        print(message)
+        # print(message)
         # key = [key_rotors, [reflB], msg_key_list, key_rings, key_connections]
         key.starts = msg_key_list
         enigma = Enigma_M3(key)
         plain = enigma.process(cipher, verbose=verbose)
         plain.lower()
         # print("Suspecting something here...")
-        print(str(date), end="  ")
+        # print(str(date), end="  ")
         # print("Suspecting...")
         # print(printable_key(key))
-        print(key)
+        # print(key)
         preplain = "Til " + recipient + "fra " + sender \
             + str(date) + " " + time + "\n"
         # print(preplain + plain)
-        return preplain + plain
+        return message, date, key, preplain + plain
 
     def get_daykey(self, label, month=None):
         """Return the daykey for the given date or kenngruppen.
@@ -326,39 +376,39 @@ class Operator():
                     # print("Yepp")
                     return Key(line), day
 
-    def divide_key(self, daykey):
-        """Split daykey for use in emigma."""
-        # TODO: Make this part of Key.__init__()
-        rotors = {}
-        for r in rotorI, rotorII, rotorIII, rotorIV,\
-                rotorV, rotorVI, rotorVII, rotorVIII:
-            rotors[r[0]] = r
+    # def divide_key(self, daykey):
+    #     """Split daykey for use in emigma."""
+    #     # TODO: Make this part of Key.__init__()
+    #     rotors = {}
+    #     for r in rotorI, rotorII, rotorIII, rotorIV,\
+    #             rotorV, rotorVI, rotorVII, rotorVIII:
+    #         rotors[r[0]] = r
 
-        keyparts = daykey.split("|")
+    #     keyparts = daykey.split("|")
 
-        key_dayofmonth = int(keyparts[1])
+    #     key_dayofmonth = int(keyparts[1])
 
-        key_rotors = keyparts[2].split()
-        for k in range(len(key_rotors)):
-            key_rotors[k] = rotors[key_rotors[k]]
+    #     key_rotors = keyparts[2].split()
+    #     for k in range(len(key_rotors)):
+    #         key_rotors[k] = rotors[key_rotors[k]]
 
-        key_rings = keyparts[3].split()
-        for k in range(len(key_rings)):
-            key_rings[k] = int(key_rings[k])
+    #     key_rings = keyparts[3].split()
+    #     for k in range(len(key_rings)):
+    #         key_rings[k] = int(key_rings[k])
 
-        key_connections = keyparts[4]
-    #    print(key_connections)
-        key_connections = key_connections.lstrip().rstrip()
-        # .replace(" ", ".")
-    #    print(key_connections)
+    #     key_connections = keyparts[4]
+    # #    print(key_connections)
+    #     key_connections = key_connections.lstrip().rstrip()
+    #     # .replace(" ", ".")
+    # #    print(key_connections)
 
-        key_kenngruppen = keyparts[5].split()
+    #     key_kenngruppen = keyparts[5].split()
 
-        return key_dayofmonth,\
-            key_rotors,\
-            key_rings,\
-            key_connections,\
-            key_kenngruppen
+    #     return key_dayofmonth,\
+    #         key_rotors,\
+    #         key_rings,\
+    #         key_connections,\
+    #         key_kenngruppen
 
     def clean_plain(self, s):
         """
