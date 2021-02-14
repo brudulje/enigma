@@ -42,39 +42,48 @@ def main():
     op = Operator()
     verbose = False  # For debugging
     if encipher:  # Encipher message
-        op.encipher(message,
-                    recipient=recipient,
-                    sender=sender,
-                    month=month,
-                    verbose=verbose)
+        ciphertext = op.encipher(message, recipient=recipient, sender=sender,
+                                 month=month, verbose=verbose)
+        print(ciphertext)
     elif not encipher:  # Decipher
-        op.decipher(message, verbose=verbose)
+        plaintext = op.decipher(message, verbose=verbose)
+        print(plaintext)
+
 
 class Operator():
-    # message, recipient=None, sender=None, encipher=True, month=None):
-    """Emulates the operator of the Enigma M3.
-
-    Args:
-        message (str):
-            Message to be enciphered or deciphered.
-        recipient (str, optional):
-            The intended recipient's code name. Defaults to None.
-        sender (str, optional):
-            The sender's code name. Defaults to None.
-        encipher (bool, optional):
-            Enciphers if True, deciphers if False. Defaults to False.
-        month (string yyyy-mm, optional):
-            Month in which to look for key, this month assumed if None.
-            Defaults to None.
-
-    Return: Returns nothing, but prints the result to terminal.
-    """
+    """Emulates the operator of the Enigma M3."""
 
     def __init__(self):
         pass
 
-    def encipher(self, message, recipient=None, sender=None, month=None, verbose=False):
+    def encipher(self, message, recipient=None, sender=None,
+                 month=None, verbose=False):
+        """
+        Encipher message using the enigma.
+
+        Parameters
+        ----------
+        message : str
+            Message to be enciphered.
+        recipient : str, optional
+            The intended recipient's code name. The default is None.
+        sender : str, optional
+            The sender's code name. The default is None.
+        month : string yyyy-mm, optional
+            Month in which to look for key, this month assumed if None.
+            The default is None.
+        verbose : bool, optional
+            DESCRIPTION. The default is False.
+
+        Returns
+        -------
+        str
+            The enciphered text.
+
+        """
+        # Time of day is part of the message metadata.
         time = str(datetime.datetime.now().time().strftime("%H%M"))
+        # Date to know which key to use.
         date = str(datetime.date.today())
         # print(date)
         daykey, _ = self.get_daykey(date)
@@ -136,9 +145,29 @@ class Operator():
             ciphertext = precipher + cipher
             print(str(date), end="  ")
             print(printable_key(key))
-            print(ciphertext)
+            # print(ciphertext)
+            return ciphertext
 
     def decipher(self, message, month=None, verbose=False):
+        """
+        Decipher message.
+
+        Parameters
+        ----------
+        message : str
+            Message to be decipered including encrypted premessage metadata.
+        month : string yyyy-mm, optional
+            Month in which to look for key, current month assumed if None.
+            The default is None.
+        verbose : bool, optional
+            Give extra output to terminal. The default is False.
+
+        Returns
+        -------
+        str
+            The decipered text.
+
+        """
         # Find recipient
         recipient = re.findall("[A-Z]+ ", message)[0]
 
@@ -186,8 +215,8 @@ class Operator():
         print(printable_key(key))
         preplain = "Til " + recipient + "fra " + sender \
             + str(date) + " " + time + "\n"
-        print(preplain + plain)
-
+        # print(preplain + plain)
+        return preplain + plain
 
     def get_daykey(self, label, month=None):
         """Return the daykey for the given date or kenngruppen.
@@ -213,19 +242,23 @@ class Operator():
             day = datetime.datetime.strptime(label, "%Y-%m-%d").date()
             return self.get_key_from_date(day), str(day)
         elif re.match("[0-9]{2}", label):
-            # Label is a day of month, assuming this month
+            # Label is a day of month
             if month is None:
+                # Assuming current month
                 today = datetime.date.today()
                 day = datetime.date(today.year, today.month, int(label))
             else:
+                # Using specified month
                 day = datetime.date(month[:4], month[-2:], label)
             return self.get_key_from_date(day), str(day)
 
         elif re.match("[A-Z]{3}", label):
             # Label is a kenngruppe, assuming from this month
             if month is None:
+                # Assuming current month
                 day = datetime.date.today()
             else:
+                # Using specified month
                 day = datetime.date(month[:4], month[-2:], 1)
             keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
             with open(keyfilename, "r") as infile:
@@ -239,6 +272,7 @@ class Operator():
                                                           line)[0]))
                         return line, str(day)
         else:
+            print(f"get_daykey got invalid input {label=}.")
             # Program will crash here.
             print(f"Label format not recognised {label}.")
 
