@@ -558,24 +558,27 @@ class Key():
 
     def __init__(self, keytext):  # rotors, refl, starts, rings, plugs, kenns):
         """
+        Initialize key object from code book string (daykey).
 
         keytext : str
             Line from code book containing daykey.
         """
 
-        rotors = {}
-        for r in rotorI, rotorII, rotorIII, rotorIV,\
-                rotorV, rotorVI, rotorVII, rotorVIII:
-            rotors[r[0]] = r
+        # rotors = {}
+        # for r in rotorI, rotorII, rotorIII, rotorIV,\
+        #         rotorV, rotorVI, rotorVII, rotorVIII:
+        #     rotors[r[0]] = r
+        # print(rotors)
 
         keyparts = keytext.split("|")
 
         self.dayofmonth = int(keyparts[1])
 
         self.rotors = keyparts[2].split()
-        for k in range(len(self.rotors)):
-            self.rotors[k] = rotors[self.rotors[k]]
-
+        print(f"{self.rotors=}")
+        # for k in range(len(self.rotors)):
+        #     self.rotors[k] = rotors[self.rotors[k]]
+        # print(f"{self.rotors=}")
         self.rings = keyparts[3].split()
         for k in range(len(self.rings)):
             self.rings[k] = int(self.rings[k])
@@ -595,7 +598,7 @@ class Key():
         #     key_connections,\
         #     key_kenngruppen
         # self.rotors = rotors
-        self.refl = reflB
+        self.refl = reflB  # Hardcoding reflector B.
         self.starts = []
         # self.rings = rings
         # self.plugs = plugs
@@ -607,8 +610,8 @@ class Key():
             + self.rotors[1][0] + " " \
             + self.rotors[2][0] + "  "
         if self.starts is not None:
-            s = s + self.starts[0] + " "\
-                + self.starts[1] + " "\
+            s = s + self.starts[0] + " " \
+                + self.starts[1] + " " \
                 + self.starts[2] + "  "
         s = s + str(self.rings[0]) + " " \
             + str(self.rings[1]) + " " \
@@ -651,20 +654,20 @@ class Enigma_M3():
     """
     # TODO: Implement list of rotors as class attributes
     # TODO: Reshape key and refer to rotors by string of roman number.
-    __rotors = [
+    __Rotors = {
         # 0 : "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split(),
         # rotor = ["name", "cipher alpha", [notches]]
-        ["0",   "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
-        ["I",   "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q"]],  # Q = 17
-        ["II",  "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E"]],  # E = 05
-        ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V"]],  # V = 22
-        ["IV",  "ESOVPZJAYQUIRHXLNFTGKDCMWB", ["J"]],  # J = 10
-        ["V",   "VZBRGITYUPSDNHLXAWMJQOFECK", ["Z"]],  # Z = 26
+        "0"   : ["0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
+        "I"   : ["I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q"]],  # Q = 17
+        "II"  : ["II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E"]],  # E = 05
+        "III" : ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V"]],  # V = 22
+        "IV"  : ["IV", "ESOVPZJAYQUIRHXLNFTGKDCMWB", ["J"]],  # J = 10
+        "V"   : ["V", "VZBRGITYUPSDNHLXAWMJQOFECK", ["Z"]],  # Z = 26
         # Rotors VI - VIII only on Enigma M3, not on the Enigma I.
-        ["VI",  "JPGVOUMFYQBENHZRDKASXLICTW", ["Z", "M"]],  # Z=26, M=13
-        ["VII", "NZJHGRCXMYSWBOUFAIVLPEKQDT", ["Z", "M"]],  # Z=26, M=13
-        ["VIII","FKQHTLXOCBJSPDZRAMEWNIUYGV", ["Z", "M"]],  # Z=26, M=13
-    ]
+        "VI"  : ["VI", "JPGVOUMFYQBENHZRDKASXLICTW", ["Z", "M"]],  # Z=26, M=13
+        "VII" : ["VII", "NZJHGRCXMYSWBOUFAIVLPEKQDT", ["Z", "M"]],  # Z=26, M=13
+        "VIII": ["VIII", "FKQHTLXOCBJSPDZRAMEWNIUYGV", ["Z", "M"]],  # Z=26, M=13
+    }
 
     def __init__(self, key):  # , verbose=False):
         """
@@ -672,11 +675,8 @@ class Enigma_M3():
 
         Parameters
         ----------
-        key : list
-            [key_rotors, [reflB], msg_start_list, key_rings, key_connections].
-        verbose : bool, optional
-            Print all the steps in the enciphering process to terminal.
-            The default is False.
+        key : Key
+            Key object containing, well, key information.
 
         Returns
         -------
@@ -687,10 +687,14 @@ class Enigma_M3():
         # TODO for i in range(len(key[0])):
         # Make the number of active rotors adjustable.
 
+        self.rotors = []
+        for k in range(len(key.rotors)):
+            self.rotors.append(Enigma_M3.__Rotors[key.rotors[k]])
+
         # Setting up the hardware
-        self.lft = Rotor(key.rotors[0], key.starts[0], key.rings[0])
-        self.mid = Rotor(key.rotors[1], key.starts[1], key.rings[1])
-        self.rgt = Rotor(key.rotors[2], key.starts[2], key.rings[2])
+        self.lft = Rotor(self.rotors[0], key.starts[0], key.rings[0])
+        self.mid = Rotor(self.rotors[1], key.starts[1], key.rings[1])
+        self.rgt = Rotor(self.rotors[2], key.starts[2], key.rings[2])
         self.ref = Reflector(key.refl)
         self.plg = Plugboard(key.plugs)
 
