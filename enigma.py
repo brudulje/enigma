@@ -8,12 +8,6 @@ import datetime
 import re
 import secrets
 
-# TODO: Implement reflectors as Enigma_M3 class attributes
-# Reflector A only on Enigma I, not on the M3.
-reflA = ["A", "EJMZALYXVBWFCRQUONTSPIKHGD"]
-reflB = ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"]  # Standard on Enigma I.
-reflC = ["C", "FVPJIAOYEDRZXWGCTKUQSBNMHL"]
-
 
 def main():
     """Execute enigma program."""
@@ -28,9 +22,9 @@ def main():
         + "MWZPC MLFES VUFPY QBNGV PRG"
     encipher = False
     month = None
+    verbose = False  # For debugging
 
     op = Operator()
-    verbose = False  # For debugging
     if encipher:  # Encipher message
         message, date, key, ciphertext = op.encipher(message,
                                                      recipient=recipient,
@@ -489,7 +483,7 @@ class Key():
         self.plugs = keyparts[4]
         self.plugs = self.plugs.lstrip().rstrip()
         self.kenns = keyparts[5].split()
-        self.refl = reflB  # Hardcoding reflector B.
+        self.refl = "B"  # Hardcoding reflector B.
         self.starts = []
 
     def __str__(self):
@@ -510,7 +504,7 @@ class Key():
 
 class Enigma_M3():
     """Emulates the Enigma M3 machine."""
-    __Rotors = {
+    _rotors = {
         # rotor = ["name", "cipher alpha", [notches]]
         "0": ["0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
         "I": ["I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q"]],  # Q = 17
@@ -524,6 +518,13 @@ class Enigma_M3():
         "VIII": ["VIII", "FKQHTLXOCBJSPDZRAMEWNIUYGV", ["Z", "M"]],
     }
 
+    _reflectors = {
+        "A": ["A", "EJMZALYXVBWFCRQUONTSPIKHGD"],\
+        # reflB is standard on Enigma I.
+        "B": ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"],\
+        "C": ["C", "FVPJIAOYEDRZXWGCTKUQSBNMHL"],\
+    }
+
     def __init__(self, key):  # , verbose=False):
         """
         Sets up the Enigma according to given key.
@@ -533,22 +534,23 @@ class Enigma_M3():
         key : Key
             Key object containing, well, key information.
 
-        Returns
-        -------
-        None.
-
         """
         # TODO for i in range(len(key[0])):
         # Make the number of active rotors adjustable.
 
         # Setting up the hardware
-        self.lft = Rotor(Enigma_M3.__Rotors[key.rotors[0]],
+        # Left rotor
+        self.lft = Rotor(self._rotors[key.rotors[0]],
                          key.starts[0], key.rings[0])
-        self.mid = Rotor(Enigma_M3.__Rotors[key.rotors[1]],
+        # Middle rotor
+        self.mid = Rotor(self._rotors[key.rotors[1]],
                          key.starts[1], key.rings[1])
-        self.rgt = Rotor(Enigma_M3.__Rotors[key.rotors[2]],
+        # Rigth rotor
+        self.rgt = Rotor(self._rotors[key.rotors[2]],
                          key.starts[2], key.rings[2])
-        self.ref = Reflector(key.refl)
+        # Reflector
+        self.ref = Reflector(self._reflectors[key.refl])
+        # Plugbord
         self.plg = Plugboard(key.plugs)
 
     def process(self, text, verbose=False):
@@ -636,6 +638,7 @@ class Enigma_M3():
 class Disk():
     """A parent class for the rotors and reflectors."""
     __alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
+    #TODO : See if this can be coded in only one single place.
 
     def __init__(self, name, wires):
         self._name = name
