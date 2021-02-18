@@ -13,13 +13,16 @@ def main():
     """Execute enigma program."""
     recipient = "ABC"
     sender = "QRSTU"
-    message = "Skal vi se, da, funker det?"
-    message = "F Q 2115 = 33 = HXA QLQ UJCXQ FBDZJ ZLQNV "\
-        + "OBYWY QEIVM KJDEW ZPV"
-    message = "F Q 2001 = 33 = YZW OYC GWYNB HLUVT ALIID "\
-        + "ATVLK ROZYA VJKXW RED"
-    message = "ABC QRSTU 2022 = 33 = QKX GHW GDIQC WFPQQ "\
-        + "MWZPC MLFES VUFPY QBNGV PRG"
+    message = "Skal vi se, da, funker det? Jeg vil ha 1000."
+    # message = "F Q 2115 = 33 = HXA QLQ UJCXQ FBDZJ ZLQNV "\
+    #     + "OBYWY QEIVM KJDEW ZPV"
+    # message = "F Q 2001 = 33 = YZW OYC GWYNB HLUVT ALIID "\
+    #     + "ATVLK ROZYA VJKXW RED"
+    # message = "ABC QRSTU 2022 = 33 = QKX GHW GDIQC WFPQQ "\
+    #     + "MWZPC MLFES VUFPY QBNGV PRG"
+    message = "ABC QRSTU 2027 = 50 = WUD ELM RWAGA IHGXI LBNKH "\
+        + "MKXIU YPLTT JZNUN HFCAG HLOVA QNRXC LQJCR"
+    encipher = True
     encipher = False
     month = None
     verbose = False  # For debugging
@@ -45,10 +48,10 @@ def main():
 
 class Operator():
     """Emulates the operator of the Enigma M3."""
-    __alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
 
     def __init__(self):
-        pass
+        self._alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
+        #TODO : See if this can be coded in only one single place.
 
     def encipher(self, message, recipient="ABC", sender="QRS",
                  month=None, verbose=False):
@@ -100,13 +103,16 @@ class Operator():
 
         # Clean plain
         plaintext = self.clean_plain(message)
+
+        # Maximum lenght is 250 characters, but this includes the five-letter
+        # group containing two random letters and the three-letter kenngruppen.
         maxlength = 245
         parts = [plaintext[i: i + maxlength] \
                  for i in range(0, len(plaintext), maxlength)]
 
-        for n in range(len(parts)):
+        for part in parts:
             # choose random message start pos (3 letters)
-            msg_start = ''.join(secrets.choice(Operator.__alphabet) \
+            msg_start = ''.join(secrets.choice(self._alphabet) \
                                 for i in range(3))
             msg_start_list = msg_start.replace("", " ").split()
             # print(msg_start_list)
@@ -116,21 +122,22 @@ class Operator():
             enigma = Enigma_M3(key)
 
             # choose random message key (3 letters)
-            msg_key = ''.join(secrets.choice(Operator.__alphabet) \
+            msg_key = ''.join(secrets.choice(self._alphabet) \
                               for i in range(3))
             msg_key_list = msg_key.replace("", " ").split()
             enc_msg_key = enigma.process(msg_key, verbose=verbose)
             key.starts = msg_key_list
 
             # make buchstabenkenngruppen
-            letterIDgroup = ''.join(secrets.choice(Operator.__alphabet) \
+            letterIDgroup = ''.join(secrets.choice(self._alphabet) \
                                     for i in range(2)) \
                             + secrets.choice(key.kenns)
             # Encipher message
             enigma = Enigma_M3(key)
-            cipher = enigma.process(parts[n], verbose=verbose)
+            cipher = enigma.process(part, verbose=verbose)
+            cipher = self.format_in_groups(cipher)
 
-            # Format output
+            # Format metadata for output
             # start of message is
             # To: From: Clock: Lettercount: Start pos: Enciphered message key:
             # Fiveletter group containing two random letters
@@ -140,8 +147,7 @@ class Operator():
                 + " = " + str(lettercount) + " = " \
                 + msg_start + " " + enc_msg_key + " " + letterIDgroup + " "
 
-            # # Enciphered message
-            cipher = self.format_in_groups(cipher)
+            # Enciphered message
             ciphertext = precipher + cipher
 
             return message, date, key, ciphertext
@@ -156,6 +162,7 @@ class Operator():
             Message to be decipered including encrypted premessage metadata.
         month : string yyyy-mm, optional
             Month in which to look for key, current month assumed if None.
+            This is useful for deciphering old messages.
             The default is None.
         verbose : bool, optional
             Give extra output to terminal. The default is False.
@@ -170,42 +177,34 @@ class Operator():
 
         # Find recipient
         recipient = re.findall("[A-Z]+ ", message)[0]
-        # print(recipient)
         message = message[len(recipient):]
-        # print(message)
 
         # Find sender
         sender = re.findall("[A-Z]+ ", message)[0]
-        # print(sender)
         message = message[len(sender):]
-        # print(message)
 
         # Find time
         time = re.search("[0-9]{4}", message)[0]
         time = time[:2] + ":" + time[-2:]
-        # print(time)
         message = message[len(time):]
-        # print(message)
 
         # Find message length
         # Message length should be a number between two equal signs.
         # The message length is not allowed to exceed 245.
 
         length = re.search("= [0-9]+ =", message)[0]
-        messagelength = int(length[2:-2])
-        # print(messagelength)
+        messagelength = int(length[1:-1])
         message = message[len(length):]
-        # print(message)
 
         # Find message start pos
         # Find enciphered message key
         tla = re.findall("(?=( [A-Z]{3}[\s]))", message)  # ThreeLetterAcronym
-        message = message[len(tla[0]):]
-        # Subtract 1 because the space between the two tla is counted twice.
-        message = message[len(tla[1]) - 1:]
         msg_start = tla[0].strip()
         enc_msg_key = tla[1].strip()
-        msg_start_list = msg_start.replace("", " ").split()
+        # msg_start_list = msg_start.replace("", " ").split()
+        message = message[len(tla[0]) + len(tla[1]) - 1:]
+        # Subtract 1 because the space between the two tla is counted twice.
+        # message = message[:]
 
         # What is left of the message is what is counted in the message lenght
         actual_message_length = len(message.replace(" ", ""))
@@ -224,12 +223,12 @@ class Operator():
 
         # Look up key in book
         key, date = self.get_daykey(kenngruppen, month=month)
-        key.starts = msg_start_list
+        key.starts = msg_start
 
         # Decipher message key
         enigma = Enigma_M3(key)
         msg_key = enigma.process(enc_msg_key, verbose=verbose)
-        msg_key_list = msg_key.replace("", " ").split()
+        # msg_key_list = msg_key.replace("", " ").split()
 
         # Get the actual message, i.e. after the 5 letter kenngruppen
         cipher = message.partition(kenngruppen)[-1].replace(" ", "")
@@ -237,7 +236,7 @@ class Operator():
 
         # Decipher message.
         # print(message)
-        key.starts = msg_key_list
+        key.starts = msg_key
         enigma = Enigma_M3(key)
         plain = enigma.process(cipher, verbose=verbose)
         plain.lower()
@@ -353,8 +352,8 @@ class Operator():
         s = s.replace("", " ").split()
         for i, letter in enumerate(s):
             # print(i, s[i])
-            if letter.upper() in Operator.__alphabet \
-               or letter in Operator.__alphabet:
+            if letter.upper() in self._alphabet \
+               or letter in self._alphabet:
                 # Lower case letter or upper case letter
                 s[i] = letter.upper()
             elif letter == ".":
@@ -403,13 +402,13 @@ class Operator():
                 s.insert(i, "FUNF")
             elif letter == "6":
                 _ = s.pop(i)
-                s.insert(i, "SECHS")
+                s.insert(i, "SEQS")
             elif letter == "7":
                 _ = s.pop(i)
                 s.insert(i, "SIEBEN")
             elif letter == "8":
                 _ = s.pop(i)
-                s.insert(i, "ACHT")
+                s.insert(i, "AQT")
             elif letter == "9":
                 _ = s.pop(i)
                 s.insert(i, "NEUN")
@@ -463,7 +462,7 @@ class Operator():
 class Key():
     """Represents the key."""
 
-    def __init__(self, keytext):  # rotors, refl, starts, rings, plugs, kenns):
+    def __init__(self, keytext):
         """
         Initialize key object from code book string (daykey).
 
@@ -474,24 +473,25 @@ class Key():
         keyparts = keytext.split("|")
 
         self.dayofmonth = int(keyparts[1])
-
         self.rotors = keyparts[2].split()
         self.rings = keyparts[3].split()
+        # print(f"{self.rings=}")
         for k in range(len(self.rings)):
             self.rings[k] = int(self.rings[k])
+        # print(f"{self.rings=}")
 
         self.plugs = keyparts[4]
         self.plugs = self.plugs.lstrip().rstrip()
         self.kenns = keyparts[5].split()
         self.refl = "B"  # Hardcoding reflector B.
-        self.starts = []
+        self.starts = ""  # Start position is not read from codebook/file.
 
     def __str__(self):
         """Return string to print the daykey nicely."""
         s = self.rotors[0] + " " \
             + self.rotors[1] + " " \
             + self.rotors[2] + "  "
-        if self.starts is not None:
+        if self.starts:
             s = s + self.starts[0] + " " \
                 + self.starts[1] + " " \
                 + self.starts[2] + "  "
@@ -545,7 +545,7 @@ class Enigma_M3():
         # Middle rotor
         self.mid = Rotor(self._rotors[key.rotors[1]],
                          key.starts[1], key.rings[1])
-        # Rigth rotor
+        # Right rotor
         self.rgt = Rotor(self._rotors[key.rotors[2]],
                          key.starts[2], key.rings[2])
         # Reflector
@@ -559,6 +559,7 @@ class Enigma_M3():
 
         The text is enciphered (or if it is already enciphered, deciphered).
         This method probably needs a better neam than "process".
+        This is the heart of the machine.
 
         Parameters
         ----------
@@ -583,6 +584,7 @@ class Enigma_M3():
 
         # Turn rotors appropriately
         for ch in text:
+            # The right rotor turns before the letter is processed.
             posR = self.rgt.turn()
             if posM + 1 in self.mid.get_notch():
                 posM = self.mid.turn()
@@ -637,15 +639,14 @@ class Enigma_M3():
 
 class Disk():
     """A parent class for the rotors and reflectors."""
-    __alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
-    #TODO : See if this can be coded in only one single place.
 
     def __init__(self, name, wires):
+        self._alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
         self._name = name
         self._wires = wires
-        self._alpha_plain = Disk.__alphabet[:]
+        self._alpha_plain = self._alphabet[:]
         self._alpha_vor = self._wires.replace("", " ").split()
-        self._alpha_ruck = Disk.__alphabet[:]
+        self._alpha_ruck = self._alphabet[:]
         self.set_ruck()
 
     def __str__(self):
@@ -657,6 +658,14 @@ class Disk():
 
         This function substitutes while the signal moves "forward" thru
         the disk, i.e. towards the reflector.
+
+        Args:
+            ch, single character
+                Character to be enciphered.
+        Returns:
+            str
+            The enciphered character.
+
         """
         i = self._alpha_plain.index(ch)
         ch = self._alpha_vor[i]
@@ -714,6 +723,13 @@ class Rotor(Disk):
 
         This adds to Disk.vor by taking the position of the rotor
         into account.
+
+        Args:
+            ch, single character
+                Character to be enciphered.
+        Returns:
+            str
+            The enciphered character.
         """
         ch = Disk.vor(self, ch)
         i = self._alpha_plain.index(ch) - self._position
@@ -725,6 +741,13 @@ class Rotor(Disk):
 
         This function substitutes while the signal moves "back" thru
         the disk, i.e. from the reflector.
+
+        Args:
+            ch, single character
+                Character to be enciphered.
+        Returns:
+            str
+            The enciphered character.
         """
         i = (self._alpha_plain.index(ch) + self._position) \
             % len(self._alpha_plain)  # 26
@@ -748,11 +771,12 @@ class Reflector(Disk):
 
 class Plugboard():
     """The plugboard just after the keyboard and just before the lamps."""
-    __alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
 
     def __init__(self, connections):
-        self._alpha_plain = Plugboard.__alphabet[:]
-        self._alpha_vor = Plugboard.__alphabet[:]
+        # The plain alphabet
+        self._alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
+        self._alpha_plain = self._alphabet[:]
+        self._alpha_vor = self._alphabet[:]
         self._sanity_check(connections)
         self.connections = connections.split()  # .replace(".", " ").split()
 
