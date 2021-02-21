@@ -43,13 +43,13 @@ def main():
 
         # Write header
         out.write("GEHEIM!")
-        out.write(f"{'brudulje enigmaSchlussel' : >49}")
+        out.write(f"{'brudulje enigmaSchlussel' : >48}")
         monthString = nextMonth.strftime("%B %Y")
-        out.write(f"{monthString : >32} \n")
-        out.write(89 * "-" + "\n")
-        out.write("|Tag |   Walzenlage   | Ringstellung |      "
+        out.write(f"{monthString : >31} \n\n")
+        out.write(87 * "-" + "\n")
+        out.write("|Tag |   Walzenlage   |Ringstellung|      "
                   + "Steckerverbindungen       |   Kenngruppen   |\n")
-        out.write(89 * "-" + "\n")
+        out.write(87 * "-" + "\n")
 
         # Get, format and write daykey for each day
         # For simplicity, each month will have 31 daykeys.
@@ -62,17 +62,17 @@ def main():
             out.write(f"| {day:02d} | ")
             for walz in walzen:
                 out.write(f"{walz:5}")
-            out.write("|   ")
+            out.write("|  ")
             for ring in rings:
                 out.write(f"{ring:02} ")
-            out.write("  | " + stecker + "  | ")
+            out.write(" | " + stecker + "  | ")
             for kenn in kenngruppen:
                 out.write(f"{kenn:4}")
             out.write("|  \n")
+        out.write(87 * "-" + "\n")
 
 
 def getWalzen():
-    # TODO: Make proper function.
     walzen = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
     # print(walzen)
     w1 = secrets.choice(walzen)  # Pick one at random
@@ -88,8 +88,11 @@ def getWalzen():
 
 
 def getRings():
-    # TODO: Make proper function.
-    return 13, 17, 29
+    rings = range(1, 26 + 1)
+    r1 = secrets.choice(rings)
+    r2 = secrets.choice(rings)
+    r3 = secrets.choice(rings)
+    return r1, r2, r3
 
 
 def getStecker():
