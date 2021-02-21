@@ -54,10 +54,10 @@ def main():
         # Get, format and write daykey for each day
         # For simplicity, each month will have 31 daykeys.
         for day in range(31, 0, -1):
-            walzen = getWalzen()
-            rings = getRings()
-            stecker = getStecker()
-            kenngruppen = getKenngruppen()
+            walzen = getWalzen(3)
+            rings = getRings(3)
+            stecker = getStecker(10)
+            kenngruppen = getKenngruppen(4)
 
             out.write(f"| {day:02d} | ")
             for walz in walzen:
@@ -72,35 +72,37 @@ def main():
         out.write(87 * "-" + "\n")
 
 
-def getWalzen():
+def getWalzen(wal=3):
     walzen = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
-    # print(walzen)
-    w1 = secrets.choice(walzen)  # Pick one at random
-    walzen.pop(walzen.index(w1))  # Remove it from the pool
-    # print(walzen)
-    w2 = secrets.choice(walzen)
-    walzen.pop(walzen.index(w2))
-    # print(walzen)
-    w3 = secrets.choice(walzen)
-    walzen.pop(walzen.index(w3))
-    # print(walzen)
-    return w1, w2, w3
+    walz = []
+    for w in range(wal):
+        wa = secrets.choice(walzen)  # Pick one at random
+        walz.append(wa)  # Add it to the list
+        walzen.pop(walzen.index(wa))  # Remove it from the pool
+    return walz
 
 
-def getRings():
+def getRings(rin=3):
     rings = range(1, 26 + 1)
-    r1 = secrets.choice(rings)
-    r2 = secrets.choice(rings)
-    r3 = secrets.choice(rings)
-    return r1, r2, r3
+    ring = []
+    for r in range(rin):
+        # Pick one at random, leave it in the list
+        ring.append(secrets.choice(rings))
+    return ring
 
 
-def getStecker():
-    # TODO: Make proper function.
-    return "AB CD EF GH IJ KL MN OP QR ST"
+def getStecker(verbindung=10):
+    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    s = ""
+    for n in range(2 * verbindung):
+        letter = secrets.choice(letters)  # Pick one at random
+        letters = letters.replace(letter, "")  # Remove it from the pool
+        s += letter
+    steck = " ".join(s[i: i + 2] for i in range(0, len(s), 2))
+    return steck
 
 
-def getKenngruppen():
+def getKenngruppen(ken=4):
     # TODO: Make proper function.
     return "ABC", "DEF", "GHI", "JKL"
 
