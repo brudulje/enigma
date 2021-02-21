@@ -72,29 +72,29 @@ def main():
         out.write(87 * "-" + "\n")
 
 
-def getWalzen(wal=3):
+def getWalzen(walzezahl=3):
     walzen = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"]
     walz = []
-    for w in range(wal):
+    for w in range(walzezahl):
         wa = secrets.choice(walzen)  # Pick one at random
         walz.append(wa)  # Add it to the list
         walzen.pop(walzen.index(wa))  # Remove it from the pool
     return walz
 
 
-def getRings(rin=3):
+def getRings(ringzahl=3):
     rings = range(1, 26 + 1)
     ring = []
-    for r in range(rin):
+    for r in range(ringzahl):
         # Pick one at random, leave it in the list
         ring.append(secrets.choice(rings))
     return ring
 
 
-def getStecker(verbindung=10):
+def getStecker(verbindungen=10):
     letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     s = ""
-    for n in range(2 * verbindung):
+    for n in range(2 * verbindungen):
         letter = secrets.choice(letters)  # Pick one at random
         letters = letters.replace(letter, "")  # Remove it from the pool
         s += letter
@@ -102,8 +102,23 @@ def getStecker(verbindung=10):
     return steck
 
 
-def getKenngruppen(ken=4):
+def getKenngruppen(gruppen=4):
     # TODO: Make proper function.
+    """
+    This one is slightly more complicated. We want to keep track of the
+    kenngruppen we have already used, and not use them again for as long
+    as possible.
+
+    """
+    usedfile = "usedKenngruppen.txt"
+    letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+    possibleKen = ["".join(a+b+c)
+                   for a in letters
+                   for b in letters
+                   for c in letters]
+    # TODO: Finish function.
+    print(possibleKen[0], " ", possibleKen[1872], " ", possibleKen[15723])
     return "ABC", "DEF", "GHI", "JKL"
 
 
