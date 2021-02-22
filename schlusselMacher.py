@@ -45,11 +45,11 @@ def main():
         out.write("GEHEIM!")
         out.write(f"{'brudulje enigmaSchlussel' : >48}")
         monthString = nextMonth.strftime("%B %Y")
-        out.write(f"{monthString : >31} \n\n")
-        out.write(87 * "-" + "\n")
+        out.write(f"{monthString : >30} \n\n")
+        out.write(86 * "-" + "\n")
         out.write("|Tag |   Walzenlage   |Ringstellung|      "
-                  + "Steckerverbindungen       |   Kenngruppen   |\n")
-        out.write(87 * "-" + "\n")
+                  + "Steckerverbindungen      |   Kenngruppen   |\n")
+        out.write(86 * "-" + "\n")
 
         # Get, format and write daykey for each day
         # For simplicity, each month will have 31 daykeys.
@@ -65,7 +65,7 @@ def main():
             out.write("|  ")
             for ring in rings:
                 out.write(f"{ring:02} ")
-            out.write(" | " + stecker + "  | ")
+            out.write(" | " + stecker + " | ")
             for kenn in kenngruppen:
                 out.write(f"{kenn:4}")
             out.write("|  \n")
@@ -103,23 +103,50 @@ def getStecker(verbindungen=10):
 
 
 def getKenngruppen(gruppen=4):
-    # TODO: Make proper function.
     """
     This one is slightly more complicated. We want to keep track of the
     kenngruppen we have already used, and not use them again for as long
     as possible.
 
     """
-    usedfile = "usedKenngruppen.txt"
     letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    usedfile = "usedKen.txt"
+    used = []
+    kenngruppen = []
 
-    possibleKen = ["".join(a+b+c)
+    # Generate all possible kenngruppen
+    possibleKen = [a + b + c
                    for a in letters
                    for b in letters
                    for c in letters]
-    # TODO: Finish function.
-    print(possibleKen[0], " ", possibleKen[1872], " ", possibleKen[15723])
-    return "ABC", "DEF", "GHI", "JKL"
+
+    # Read the ones we have already used from file
+    with open(usedfile, "r") as infile:
+        used = infile.read().split()
+
+    # TODO : Try to speed up the removal of the used kenngruppen.
+    # Remove the used ones from the possible ones.
+    # for ken in used:
+    #     possibleKen.pop(possibleKen.index(ken))
+    possibleKen = [k for k in possibleKen if k not in used]
+
+    # possibleSet = set(possibleKen)
+    # # usedSet = set(used)
+    # possibleSet = possibleSet.difference(used)
+
+    # Pick the kenngruppen.
+    for n in range(gruppen):
+        # ken = secrets.choice(possibleSet)
+        ken = secrets.choice(possibleKen)
+        kenngruppen.append(ken)
+        # possibleSet.remove(ken)
+        possibleKen.pop(possibleKen.index(ken))
+
+    # Add the newly picked kenngruppen to the used ones.
+    with open(usedfile, "a") as out:
+        for ken in kenngruppen:
+            out.write(" " + ken)
+    return kenngruppen
 
 
 if __name__ == "__main__":
