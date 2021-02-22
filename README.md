@@ -17,10 +17,7 @@ setting i.e. the key, and the ciphertext to terminal.
 
 The Enigma is symmetrical, thus giving the ciphertext as
 `plain`should return the plaintext, albeit without punctuation
-and in groups of 5 letters.
-
-The machine is symmetric, i.e. it does return the plaintext if
-the plaintext is enciphered twice. It also agrees with online
+and in groups of 5 letters. It also agrees with online
 emulators [Cryptii](https://cryptii.com/pipes/enigma-machine "https://cryptii.com/pipes/enigma-machine") and
 [101 Computing](https://www.101computing.net/enigma-machine-emulator/ "https://www.101computing.net/enigma-machine-emulator/")
 
@@ -38,7 +35,13 @@ the top of
 determine if the message is enciphered or deciphered. The key is
 no longer a required input, as this is read from the file
 `enigmaSchlusselYYYY-MM.txt`, where YYYY-MM is the month for
-which the keys are valid.
+which the keys are valid. This file is assumed to contain one
+line for each day in a month, each line specifying a key in the
+format `| 31 | IV   V    I    |   21 15 16   | KL IT FQ HY XC NP VZ JB SE OG  | JKM OGI NCJ GLP |`, where `31` is the day, `IV V I` are the rotors in use,
+`21 15 16` are the ring settings, `KL IT FQ HY XC NP VZ JB SE OG`
+are the plug settings and `JKM OGI NCJ GLP` are the letter
+identification groups.
+
 
 Running the file with `encipher = True` should write the
 cleaned plaintext (no numbers or punctuation, only A-Z), the
