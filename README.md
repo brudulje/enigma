@@ -21,6 +21,9 @@ and in groups of 5 letters. It also agrees with online
 emulators [Cryptii](https://cryptii.com/pipes/enigma-machine "https://cryptii.com/pipes/enigma-machine") and
 [101 Computing](https://www.101computing.net/enigma-machine-emulator/ "https://www.101computing.net/enigma-machine-emulator/")
 
+The Enigma's inner workings have mostly been found at
+[Wikipedia](https://en.wikipedia.org/wiki/Enigma_machine)
+
 ## v2.0 ##
 
 This version emulates the machine and its operator. The message
@@ -40,8 +43,9 @@ line for each day in a month, each line specifying a key in the
 format `| 31 | IV   V    I    |   21 15 16   | KL IT FQ HY XC NP VZ JB SE OG  | JKM OGI NCJ GLP |`, where `31` is the day, `IV V I` are the rotors in use,
 `21 15 16` are the ring settings, `KL IT FQ HY XC NP VZ JB SE OG`
 are the plug settings and `JKM OGI NCJ GLP` are the letter
-identification groups.
-
+identification groups. Such files can be generated at
+[meinEnigma](http://meinEnigma.com/keychart.php "http://meinEnigma.com/keychart.php").
+A keyfile generator is planned in a future version.
 
 Running the file with `encipher = True` should write the
 cleaned plaintext (no numbers or punctuation, only A-Z), the
@@ -54,8 +58,9 @@ to terminal.
 If the message to be deciphered was sent this month, the operator
 will get the right key from `enigmaSchlusselYYYY-MM.txt`. If the
 message is older, the month it was sent must be specified using
-the `month` variable `month = YYYY-MM`.
+the `month` variable `month = YYYY-MM`. This will make sure the
+operator reads the riight keyfile.
 
 There is also a `verbose` variable which, if True will write
 all the steps of the (en/de)ciphering process of each letter
-in the (cipher/plain)text.
+in the (plain/cipher)text.
