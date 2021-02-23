@@ -4,8 +4,8 @@ Created on Sun Feb 21 16:27:47 2021
 
 @author: jmg
 """
-
 import datetime
+import os
 import secrets
 
 """
@@ -52,7 +52,8 @@ def main():
         out.write("GEHEIM!")
         out.write(f"{'brudulje enigmaSchlussel' : >48}")
         monthString = nextMonth.strftime("%B %Y")
-        out.write(f"{monthString : >30} \n\n")
+        out.write(f"{monthString : >30} \n")
+        out.write(f"{'github.com/brudulje/enigma': >56}\n")
         out.write(86 * "-" + "\n")
         out.write("|Tag |   Walzenlage   |Ringstellung|      "
                   + "Steckerverbindungen      |   Kenngruppen   |\n")
@@ -122,34 +123,30 @@ def getKenngruppen(gruppen=4):
     kenngruppen = []
 
     # Generate all possible kenngruppen
-    possibleKen = [a + b + c
-                   for a in letters
-                   for b in letters
-                   for c in letters]
+    possible_ken = [a + b + c
+                    for a in letters
+                    for b in letters
+                    for c in letters]
 
     # Read the ones we have already used from file
-    with open(usedfile, "r") as infile:
-        used = infile.read().split()
+    if os.path.isfile(usedfile):
+        with open(usedfile, "r") as infile:
+            used = infile.read().split()
 
-    # TODO : Try to speed up the removal of the used kenngruppen.
     # Remove the used ones from the possible ones.
-    # for ken in used:
-    #     possibleKen.pop(possibleKen.index(ken))
-    possibleKen = [k for k in possibleKen if k not in used]
-
-    # possibleSet = set(possibleKen)
-    # # usedSet = set(used)
-    # possibleSet = possibleSet.difference(used)
+    # This is faster using sets
+    possible_set = set(possible_ken)
+    used_set = set(used)
+    possible_set = possible_set.difference(used_set)
+    possible_ken = list(possible_set)
 
     # Pick the kenngruppen.
     for n in range(gruppen):
-        # ken = secrets.choice(possibleSet)
         # Eventually, you run out of unused kenngruppen and
         # the program will crash here.
-        ken = secrets.choice(possibleKen)
+        ken = secrets.choice(possible_ken)
         kenngruppen.append(ken)
-        # possibleSet.remove(ken)
-        possibleKen.pop(possibleKen.index(ken))
+        possible_ken.pop(possible_ken.index(ken))
 
     # Add the newly picked kenngruppen to the used ones.
     with open(usedfile, "a") as out:
