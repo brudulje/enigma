@@ -22,13 +22,20 @@ Steckerverbindungen are 10 pairs of letters from the 26 letter
 alphabet. No letter may be present more than once.
 
 The kenngruppen are three-letter groups. These are used to figure
-out which key applies to a message. There are 26**3 = 17576 different
-kenngruppen. With 4 kenngruppen each day, this is sufficient for 12 years
-before a kenngruppen must be used again. Thus, in this key generator, the
-kenngruppen are not reused.
+out which key applies to a message. There are 26**3 = 17576
+different kenngruppen. With 4 kenngruppen each day, this is
+sufficient for 12 years before a kenngruppen must be used again.
+Thus, in this key generator, the kenngruppen are not reused.
 
-Keys are generated for one month at a time. It is assumed that keys are
-generated for the month following the current month.
+A file named usedKen.txt is used to store all the used
+kenngruppen. These will not be used again. When generating keys
+for the 142nd month (int(26**3/(31*4)) = 141), the list of
+kenngruppen will go empty. This can be rectified by deleting
+usedKen.txt, which will start reusing kenngruppen.
+
+Keys are generated for one month at a time. It is assumed that
+keys are generated for the month following the current month.
+The output is written to a file named enigmaSchlusselYYYY-MM.txt.
 """
 
 
@@ -137,6 +144,8 @@ def getKenngruppen(gruppen=4):
     # Pick the kenngruppen.
     for n in range(gruppen):
         # ken = secrets.choice(possibleSet)
+        # Eventually, you run out of unused kenngruppen and
+        # the program will crash here.
         ken = secrets.choice(possibleKen)
         kenngruppen.append(ken)
         # possibleSet.remove(ken)
