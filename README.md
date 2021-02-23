@@ -48,7 +48,7 @@ identification groups. Such files can be generated at
 A keyfile generator is planned in a future version.
 
 Running the file with `encipher = True` should write the
-cleaned plaintext (no numbers or punctuation, only A-Z), the
+cleaned plaintext (no numbers or punctuation, only `A-Z`), the
 date, the key, and the ciphertext to terminal.
 Running the file with `encipher = False` should write the
 ciphertext, the
@@ -64,3 +64,8 @@ operator reads the riight keyfile.
 There is also a `verbose` variable which, if True will write
 all the steps of the (en/de)ciphering process of each letter
 in the (plain/cipher)text.
+
+### v2.1 ###
+
+This version has a key generator `schlusselMacher.py`. This will
+generate a month worth of daykeys for the Enigma_M3.
