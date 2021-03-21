@@ -40,7 +40,8 @@ no longer a required input, as this is read from the file
 `enigmaSchlusselYYYY-MM.txt`, where YYYY-MM is the month for
 which the keys are valid. This file is assumed to contain one
 line for each day in a month, each line specifying a key in the
-format `| 31 | IV   V    I    |   21 15 16   | KL IT FQ HY XC NP VZ JB SE OG  | JKM OGI NCJ GLP |`, where `31` is the day, `IV V I` are the rotors in use,
+format `| 31 | IV   V    I    |   21 15 16   | KL IT FQ HY XC NP VZ JB SE OG  | JKM OGI NCJ GLP |`,
+where `31` is the day, `IV V I` are the rotors in use,
 `21 15 16` are the ring settings, `KL IT FQ HY XC NP VZ JB SE OG`
 are the plug settings and `JKM OGI NCJ GLP` are the letter
 identification groups. Such files can be generated at
@@ -69,3 +70,9 @@ in the (plain/cipher)text.
 
 This version has a key generator `schlusselMacher.py`. This will
 generate a month worth of daykeys for the Enigma_M3.
+
+### v2.2 ###
+
+This version adds the possibility to specify which day's daykey
+to use when encrypting by passing the `date` keyword to
+`Operator.encipher`.
