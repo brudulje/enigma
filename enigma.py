@@ -20,10 +20,10 @@ def main():
     #     + "ATVLK ROZYA VJKXW RED"
     # message = "ABC QRSTU 2022 = 33 = QKX GHW GDIQC WFPQQ "\
     #     + "MWZPC MLFES VUFPY QBNGV PRG"
-    message = "ABC QRSTU 2027 = 50 = WUD ELM RWAGA IHGXI LBNKH "\
-        + "MKXIU YPLTT JZNUN HFCAG HLOVA QNRXC LQJCR"
-    encipher = True
+    message = "ABC QRSTU 1958 = 51 = LGK KHP PVHIA IFMFG HFOYG CXOHN LHFHE LFSYP DJSKK XOKIG WAHQH ITUXW C"
     encipher = False
+    # encipher = False
+    date = "2021-03-21"
     month = None
     verbose = False  # For debugging
 
@@ -32,14 +32,16 @@ def main():
         message, date, key, ciphertext = op.encipher(message,
                                                      recipient=recipient,
                                                      sender=sender,
-                                                     month=month,
+                                                     date=date,
                                                      verbose=verbose)
         print(message)
         print(date, end="  ")
         print(key)
         print(ciphertext)
     elif not encipher:  # Decipher
-        message, date, key, plaintext = op.decipher(message, verbose=verbose)
+        message, date, key, plaintext = op.decipher(message,
+                                                    month=month,
+                                                    verbose=verbose)
         print(message)
         print(date, end="  ")
         print(key)
@@ -54,7 +56,7 @@ class Operator():
         #TODO : See if this can be coded in only one single place.
 
     def encipher(self, message, recipient="ABC", sender="QRS",
-                 month=None, verbose=False):
+                 date=None, verbose=False):
         """
         Encipher message using the enigma.
 
@@ -81,8 +83,8 @@ class Operator():
             The intended recipient's code name. The default is ABC.
         sender : str, optional
             The sender's code name. The default is QRS.
-        month : string yyyy-mm, optional
-            Month in which to look for key, this month assumed if None.
+        date : string yyyy-mm-dd, optional
+            Day from which to get key. Today is assumed if None.
             The default is None.
         verbose : bool, optional
             Give more output to terminal. The default is False.
@@ -95,8 +97,10 @@ class Operator():
         """
         # Time of day is part of the message metadata.
         time = str(datetime.datetime.now().time().strftime("%H%M"))
+
         # Date to know which key to use.
-        date = str(datetime.date.today())
+        if date is None:
+            date = str(datetime.date.today())
         # print(date)
         key, _ = self.get_daykey(date)
         # print(f"{key=}")
@@ -213,8 +217,8 @@ class Operator():
             # print(f"Message length is correct: {messagelength}.")
             pass
         else:
-            print("Message length is not correctly reported.\n"\
-                  + f"Should be {messagelength}, but is "\
+            print("Message length is not correctly reported.\n"
+                  + f"Should be {messagelength}, but is "
                   + f"{actual_message_length}!")
 
         # Find kenngruppen
