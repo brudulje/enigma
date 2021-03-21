@@ -139,6 +139,7 @@ class Operator():
             # Encipher message
             enigma = Enigma_M3(key)
             cipher = enigma.process(part, verbose=verbose)
+            lettercount = len(cipher) + len(letterIDgroup)
             cipher = self.format_in_groups(cipher)
 
             # Format metadata for output
@@ -146,7 +147,6 @@ class Operator():
             # To: From: Clock: Lettercount: Start pos: Enciphered message key:
             # Fiveletter group containing two random letters
             # and the 3 letter kenngruppe
-            lettercount = len(cipher) + len(letterIDgroup)
             precipher = str(recipient) + " " + str(sender) + " " + str(time)\
                 + " = " + str(lettercount) + " = " \
                 + msg_start + " " + enc_msg_key + " " + letterIDgroup + " "
