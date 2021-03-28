@@ -53,7 +53,7 @@ class Operator():
 
     def __init__(self):
         self._alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
-        #TODO : See if this can be coded in only one single place.
+        # TODO : See if this can be coded in only one single place.
 
     def encipher(self, message, recipient="ABC", sender="QRS",
                  date=None, verbose=False):
@@ -111,12 +111,12 @@ class Operator():
         # Maximum lenght is 250 characters, but this includes the five-letter
         # group containing two random letters and the three-letter kenngruppen.
         maxlength = 245
-        parts = [plaintext[i: i + maxlength] \
+        parts = [plaintext[i: i + maxlength]
                  for i in range(0, len(plaintext), maxlength)]
 
         for part in parts:
             # choose random message start pos (3 letters)
-            msg_start = ''.join(secrets.choice(self._alphabet) \
+            msg_start = ''.join(secrets.choice(self._alphabet)
                                 for i in range(3))
             msg_start_list = msg_start.replace("", " ").split()
             # print(msg_start_list)
@@ -126,14 +126,14 @@ class Operator():
             enigma = Enigma_M3(key)
 
             # choose random message key (3 letters)
-            msg_key = ''.join(secrets.choice(self._alphabet) \
+            msg_key = ''.join(secrets.choice(self._alphabet)
                               for i in range(3))
             msg_key_list = msg_key.replace("", " ").split()
             enc_msg_key = enigma.process(msg_key, verbose=verbose)
             key.starts = msg_key_list
 
             # make buchstabenkenngruppen
-            letterIDgroup = ''.join(secrets.choice(self._alphabet) \
+            letterIDgroup = ''.join(secrets.choice(self._alphabet)
                                     for i in range(2)) \
                             + secrets.choice(key.kenns)
             # Encipher message
@@ -313,9 +313,9 @@ class Operator():
                 if re.search(str(kenn), line):
                     # Correct the date to show the date on which
                     # the key was valid.
-                    day = datetime.date(int(keyfilename[15:19]),\
-                                        int(keyfilename[20:22]),\
-                                        int(re.search("[0-9]{2}",\
+                    day = datetime.date(int(keyfilename[15:19]),
+                                        int(keyfilename[20:22]),
+                                        int(re.search("[0-9]{2}",
                                                       line)[0]))
                     return Key(line), day
 
@@ -636,8 +636,8 @@ class Enigma_M3():
 
     def print_pos(self, lef, mid, rgt, end="\n"):
         """Print current positions of the rotors."""
-        print(chr(lef.get_position() + 65) + " " \
-              + chr(mid.get_position() + 65) + " " \
+        print(chr(lef.get_position() + 65) + " "
+              + chr(mid.get_position() + 65) + " "
               + chr(rgt.get_position() + 65), end=end)
 
 
@@ -688,7 +688,7 @@ class Rotor(Disk):
         super(Rotor, self).__init__(hardware[0], hardware[1])
         self._notch = []
         for i, letter in enumerate(hardware[2]):
-            self._notch.append((self._alpha_plain.index(letter) + 1) \
+            self._notch.append((self._alpha_plain.index(letter) + 1)
                                % len(self._alpha_plain))
         self._position = 0
         self.ring = ring
@@ -768,8 +768,8 @@ class Reflector(Disk):
 
     def _sanity_check(self):
         if self._alpha_vor != self._alpha_ruck:
-            raise ValueError("Reflector wires not correct. "\
-                             + "Should be symmetric. "\
+            raise ValueError("Reflector wires not correct. "
+                             + "Should be symmetric. "
                              + f"\n{self._alpha_vor}\n{self._alpha_ruck}")
 
 
