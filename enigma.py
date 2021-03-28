@@ -13,19 +13,19 @@ def main():
     """Execute enigma program."""
     recipient = "ABC"
     sender = "QRSTU"
-    message = "Skal vi se, da, funker det? Jeg vil ha 1000."
+    message = "Skal vi se da funker det Jeg vil ha mer"
     # message = "F Q 2115 = 33 = HXA QLQ UJCXQ FBDZJ ZLQNV "\
     #     + "OBYWY QEIVM KJDEW ZPV"
     # message = "F Q 2001 = 33 = YZW OYC GWYNB HLUVT ALIID "\
     #     + "ATVLK ROZYA VJKXW RED"
     # message = "ABC QRSTU 2022 = 33 = QKX GHW GDIQC WFPQQ "\
     #     + "MWZPC MLFES VUFPY QBNGV PRG"
-    message = "ABC QRSTU 1958 = 51 = LGK KHP PVHIA IFMFG HFOYG CXOHN LHFHE LFSYP DJSKK XOKIG WAHQH ITUXW C"
-    encipher = False
+    # message = "ABC QRSTU 1958 = 51 = LGK KHP PVHIA IFMFG HFOYG CXOHN LHFHE LFSYP DJSKK XOKIG WAHQH ITUXW C"
+    encipher = True
     # encipher = False
-    date = "2021-03-21"
+    date = None
     month = None
-    verbose = False  # For debugging
+    verbose = True  # For debugging
 
     op = Operator()
     if encipher:  # Encipher message
@@ -38,6 +38,8 @@ def main():
         print(date, end="  ")
         print(key)
         print(ciphertext)
+        # Debug prints
+        print(type(key.rotors))
     elif not encipher:  # Decipher
         message, date, key, plaintext = op.decipher(message,
                                                     month=month,
@@ -541,17 +543,23 @@ class Enigma_M3():
         """
         # TODO for i in range(len(key[0])):
         # Make the number of active rotors adjustable.
-
+        self.rotorlist = []
+        for n in range(len(key.rotors)):
+            # print(f"Rotor {n}")
+            rot = Rotor(self._rotors[key.rotors[n]],
+                        key.starts[n], key.rings[n])
+            self.rotorlist.append(rot)
+        # print(self.rotorlist)
         # Setting up the hardware
-        # Left rotor
-        self.lft = Rotor(self._rotors[key.rotors[0]],
-                         key.starts[0], key.rings[0])
-        # Middle rotor
-        self.mid = Rotor(self._rotors[key.rotors[1]],
-                         key.starts[1], key.rings[1])
-        # Right rotor
-        self.rgt = Rotor(self._rotors[key.rotors[2]],
-                         key.starts[2], key.rings[2])
+        # # Left rotor
+        # self.lft = Rotor(self._rotors[key.rotors[0]],
+        #                  key.starts[0], key.rings[0])
+        # # Middle rotor
+        # self.mid = Rotor(self._rotors[key.rotors[1]],
+        #                  key.starts[1], key.rings[1])
+        # # Right rotor
+        # self.rgt = Rotor(self._rotors[key.rotors[2]],
+        #                  key.starts[2], key.rings[2])
         # Reflector
         self.ref = Reflector(self._reflectors[key.refl])
         # Plugbord
@@ -582,51 +590,95 @@ class Enigma_M3():
         self.plaintext = text
         cipher = ""
 
-        _ = self.lft.get_position()
-        posM = self.mid.get_position()
-        posR = self.rgt.get_position()
+        pos = []
+        for n in range(len(self.rotorlist)):
+            pos.append(self.rotorlist[n].get_position())
+
+        # _ = self.lft.get_position()
+        # posM = self.mid.get_position()
+        # posR = self.rgt.get_position()
 
         # Turn rotors appropriately
         for ch in text:
-            # The right rotor turns before the letter is processed.
-            posR = self.rgt.turn()
-            if posM + 1 in self.mid.get_notch():
-                posM = self.mid.turn()
-                _ = self.lft.turn()
-            if posR in self.rgt.get_notch():
-                posM = self.mid.turn()
+            # # print(ch, end=" ")
+            # # The right rotor turns before the letter is processed.
+            # posR = self.rgt.turn()
+            # # If a rotor is in its notch position, it advances
+            # # and so does the rotor to its left.
+            # if posM + 1 in self.mid.get_notch():
+            #     # Double stepping
+            #     print("mid.notch")
+            #     posM = self.mid.turn()
+            #     print("mid.turn")
+            #     _ = self.lft.turn()
+            #     print("lft.turn")
+            # if posR in self.rgt.get_notch():
+            #     # Checking for posR, not posR+1
+            #     # because the right rotor has already stepped.
+            #     print("rgt.notch")
+            #     posM = self.mid.turn()
+            #     print("mid.turn")
+
+            pos[-1] = self.rotorlist[-1].turn()
+            if pos[-1] in self.rotorlist[-1].get_notch():
+                # Treating the rightmost rotor separately
+                # because it steps for every character.
+                pos[1] = self.rotorlist[-2].turn()
+
+            for n in range(len(self.rotorlist) - 2, -1, -1):
+                # traversing the list backwards skipping the
+                # first and last items.
+                if pos[n] + 1 in self.rotorlist[n].get_notch():
+                    # Double stepping (I think).
+                    print("Double stepping")
+                    pos[n] = self.rotorlist[n].turn()
+                    pos[n - 1] = self.rotorlist[n - 1].turn()
+
+            #         pass
 
             # Print rotor positions
             if verbose:
-                self.print_pos(self.lft, self.mid, self.rgt, end="   ")
+                for rotor in self.rotorlist:
+                    print(chr(rotor.get_position()+65), end =" ")
+                # pass
+                # self.print_pos(self.lft, self.mid, self.rgt, end="   ")
 
             # Encipher text
             if verbose:
-                print(f"{ch}  ", end="")
+                print(f"  {ch}  ", end="")
             ch = self.plg.vor(ch)
             if verbose:
                 print(f"-> {ch} ", end="")
-            ch = self.rgt.vor(ch)
-            if verbose:
-                print(f"-> {ch} ", end="")
-            ch = self.mid.vor(ch)
-            if verbose:
-                print(f"-> {ch} ", end="")
-            ch = self.lft.vor(ch)
-            if verbose:
-                print(f"-> {ch} ", end="")
+            for i in range(len(self.rotorlist)-1, -1, -1):
+                ch = self.rotorlist[i].vor(ch)
+                if verbose:
+                    print(f"-> {ch} ", end="")
+            # ch = self.rgt.vor(ch)
+            # if verbose:
+            #     print(f"-> {ch} ", end="")
+            # ch = self.mid.vor(ch)
+            # if verbose:
+            #     print(f"-> {ch} ", end="")
+            # ch = self.lft.vor(ch)
+            # if verbose:
+            #     print(f"-> {ch} ", end="")
             ch = self.ref.vor(ch)
             if verbose:
-                print(f"-> {ch} ", end="")
-            ch = self.lft.ruck(ch)
-            if verbose:
-                print(f"-> {ch} ", end="")
-            ch = self.mid.ruck(ch)
-            if verbose:
-                print(f"-> {ch} ", end="")
-            ch = self.rgt.ruck(ch)
-            if verbose:
-                print(f"-> {ch} ", end="")
+                print(f"->  {ch}  ", end="")
+            for i in range(len(self.rotorlist)):
+                # print(i, end="")
+                ch = self.rotorlist[i].ruck(ch)
+                if verbose:
+                    print(f"-> {ch} ", end="")
+            # ch = self.lft.ruck(ch)
+            # if verbose:
+            #     print(f"-> {ch} ", end="")
+            # ch = self.mid.ruck(ch)
+            # if verbose:
+            #     print(f"-> {ch} ", end="")
+            # ch = self.rgt.ruck(ch)
+            # if verbose:
+            #     print(f"-> {ch} ", end="")
             ch = self.plg.ruck(ch)
             if verbose:
                 print(f"->  {ch}")
