@@ -14,9 +14,9 @@ def main():
     recipient = "ABC"
     sender = "QRSTU"
     message = "Skal vi se da funker det Jeg vil ha mer"
-    message = "ABC QRSTU 1848 = 35 = YFF RTO ZRRGC ZWZMM SGQUH GLQXF BRQPF YQIKR XHJSC"
-    # encipher = True
-    encipher = False
+    # message = "ABC QRSTU 1946 = 35 = LGOG IUEK JYLLN MGLDS EKXYP GMKPC KNRGS TNAOG WPWAC"
+    encipher = True
+    # encipher = False
     date = None
     month = None
     verbose = True  # For debugging
@@ -100,7 +100,8 @@ class Operator():
         # print(date)
         key, _ = self.get_daykey(date)
         # print(f"{key=}")
-
+        number_of_rotors = len(key.rotors)
+        # print(number_of_rotors)
         # Clean plain
         plaintext = self.clean_plain(message)
 
@@ -113,9 +114,10 @@ class Operator():
         for part in parts:
             # choose random message start pos (3 letters)
             msg_start = ''.join(secrets.choice(self._alphabet)
-                                for i in range(3))
+                                for i in range(number_of_rotors))
+            # print(msg_start)
             msg_start_list = msg_start.replace("", " ").split()
-            # print(msg_start_list)
+            # print(f"{msg_start_list=}.")
 
             key.starts = msg_start_list
             # encipher message key using message start pos
@@ -123,9 +125,10 @@ class Operator():
 
             # choose random message key (3 letters)
             msg_key = ''.join(secrets.choice(self._alphabet)
-                              for i in range(3))
+                              for i in range(number_of_rotors))
             msg_key_list = msg_key.replace("", " ").split()
             enc_msg_key = enigma.process(msg_key, verbose=verbose)
+            # print(f"{enc_msg_key=}.")
             key.starts = msg_key_list
 
             # make buchstabenkenngruppen
@@ -178,16 +181,18 @@ class Operator():
         # Find recipient
         recipient = re.findall("[A-Z]+ ", message)[0]
         message = message[len(recipient):]
-
+        recipient = recipient.strip()
+        # print(recipient, message)
         # Find sender
         sender = re.findall("[A-Z]+ ", message)[0]
         message = message[len(sender):]
-
+        sender = sender.strip()
+        # print(sender, message)
         # Find time
         time = re.search("[0-9]{4}", message)[0]
         time = time[:2] + ":" + time[-2:]
         message = message[len(time):]
-
+        # print(time, message)
         # Find message length
         # Message length should be a number between two equal signs.
         # The message length is not allowed to exceed 245.
@@ -195,14 +200,22 @@ class Operator():
         length = re.search("= [0-9]+ =", message)[0]
         messagelength = int(length[1:-1])
         message = message[len(length):]
-
+        # print(length, message)
         # Find message start pos
         # Find enciphered message key
-        tla = re.findall("(?=( [A-Z]{3}[\s]))", message)  # ThreeLetterAcronym
-        msg_start = tla[0].strip()
-        enc_msg_key = tla[1].strip()
+        # tla = re.findall("(?=( [A-Z]{3}[\s]))", message)  # ThreeLetterAcronym
+        msg_start = re.findall("[A-Z]+ ", message)[0]
+        message = message[len(msg_start):]
+        msg_start = msg_start.strip()
+        # print(msg_start, message)
+
+        enc_msg_key = re.findall("[A-Z]+ ", message)[0]
+        message = message[len(enc_msg_key) + 1:]
+        enc_msg_key = enc_msg_key.strip()
         # msg_start_list = msg_start.replace("", " ").split()
-        message = message[len(tla[0]) + len(tla[1]) - 1:]
+        # print(enc_msg_key, message)
+
+        # message = message[len(tla[0]) + len(tla[1]) - 1:]
         # Subtract 1 because the space between the two tla is counted twice.
         # message = message[:]
 
@@ -226,6 +239,7 @@ class Operator():
         key.starts = msg_start
 
         # Decipher message key
+        # print(f"Decipher message key using key {str(key)}.")
         enigma = Enigma_M3(key)
         msg_key = enigma.process(enc_msg_key, verbose=verbose)
         # msg_key_list = msg_key.replace("", " ").split()
@@ -237,11 +251,12 @@ class Operator():
         # Decipher message.
         # print(message)
         key.starts = msg_key
+        # print(f"Decipher message using key {str(key)}.")
         enigma = Enigma_M3(key)
         plain = enigma.process(cipher, verbose=verbose)
         plain.lower()
-        preplain = "Til " + recipient + "fra " + sender \
-            + str(date) + " " + time + "\n"
+        preplain = "Til " + recipient + " fra " + sender \
+            + " " + str(date) + " " + time + "\n"
         return message, date, key, preplain + plain
 
     def get_daykey(self, label, month=None):
@@ -493,8 +508,10 @@ class Key():
             s = s + rotor + " "
         # print(s)
         if self.starts:
+            # print("start True.")
             for start in self.starts:
-                s = s + start + " "
+                s = s + start
+            s = s + " "
         # print(s)
         for ring in self.rings:
             s = s + str(ring) + " "
@@ -539,10 +556,13 @@ class Enigma_M3():
         # TODO for i in range(len(key[0])):
         # Make the number of active rotors adjustable.
         self.rotorlist = []
+        # print(key)
+        # print(key.rotors)
         for n in range(len(key.rotors)):
             # print(f"Rotor {n}")
             rot = Rotor(self._rotors[key.rotors[n]],
-                        key.starts[n], key.rings[n])
+                        key.starts[n],
+                        key.rings[n])
             self.rotorlist.append(rot)
         # print(self.rotorlist)
         # Setting up the hardware
@@ -625,7 +645,7 @@ class Enigma_M3():
                 # first and last items.
                 if pos[n] + 1 in self.rotorlist[n].get_notch():
                     # Double stepping (I think).
-                    print("Double stepping")
+                    # print("Double stepping")
                     pos[n] = self.rotorlist[n].turn()
                     pos[n - 1] = self.rotorlist[n - 1].turn()
 
