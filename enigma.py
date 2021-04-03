@@ -14,15 +14,9 @@ def main():
     recipient = "ABC"
     sender = "QRSTU"
     message = "Skal vi se da funker det Jeg vil ha mer"
-    # message = "F Q 2115 = 33 = HXA QLQ UJCXQ FBDZJ ZLQNV "\
-    #     + "OBYWY QEIVM KJDEW ZPV"
-    # message = "F Q 2001 = 33 = YZW OYC GWYNB HLUVT ALIID "\
-    #     + "ATVLK ROZYA VJKXW RED"
-    # message = "ABC QRSTU 2022 = 33 = QKX GHW GDIQC WFPQQ "\
-    #     + "MWZPC MLFES VUFPY QBNGV PRG"
-    # message = "ABC QRSTU 1958 = 51 = LGK KHP PVHIA IFMFG HFOYG CXOHN LHFHE LFSYP DJSKK XOKIG WAHQH ITUXW C"
-    encipher = True
-    # encipher = False
+    message = "ABC QRSTU 1848 = 35 = YFF RTO ZRRGC ZWZMM SGQUH GLQXF BRQPF YQIKR XHJSC"
+    # encipher = True
+    encipher = False
     date = None
     month = None
     verbose = True  # For debugging
@@ -39,7 +33,7 @@ def main():
         print(key)
         print(ciphertext)
         # Debug prints
-        print(type(key.rotors))
+        # print(type(key.rotors))
     elif not encipher:  # Decipher
         message, date, key, plaintext = op.decipher(message,
                                                     month=month,
@@ -494,17 +488,18 @@ class Key():
 
     def __str__(self):
         """Return string to print the daykey nicely."""
-        s = self.rotors[0] + " " \
-            + self.rotors[1] + " " \
-            + self.rotors[2] + "  "
+        s = ""
+        for rotor in self.rotors:
+            s = s + rotor + " "
+        # print(s)
         if self.starts:
-            s = s + self.starts[0] + " " \
-                + self.starts[1] + " " \
-                + self.starts[2] + "  "
-        s = s + str(self.rings[0]) + " " \
-            + str(self.rings[1]) + " " \
-            + str(self.rings[2]) + "  " \
-            + self.plugs
+            for start in self.starts:
+                s = s + start + " "
+        # print(s)
+        for ring in self.rings:
+            s = s + str(ring) + " "
+        # print(s)
+        s = s + self.plugs
         return s
 
 
