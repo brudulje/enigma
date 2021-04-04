@@ -13,13 +13,13 @@ def main():
     """Execute enigma program."""
     recipient = "ABC"
     sender = "QRSTU"
-    message = "Skal vi se da funker det Jeg vil ha mer"
-    # message = "ABC QRSTU 1946 = 35 = LGOG IUEK JYLLN MGLDS EKXYP GMKPC KNRGS TNAOG WPWAC"
-    encipher = True
-    # encipher = False
+    # message = "Skal vi se da funker det Jeg vil ha mer"
+    message = "ABC QRSTU 2259 = 35 = DITGSSV ESLSTNW HWMUF NFYFB JCTLJ BOVCT MNSKQ MYUKA DCHGX"
+    # encipher = True
+    encipher = False
     date = None
     month = None
-    verbose = True  # For debugging
+    verbose = False  # For debugging
 
     op = Operator()
     if encipher:  # Encipher message
@@ -203,7 +203,6 @@ class Operator():
         # print(length, message)
         # Find message start pos
         # Find enciphered message key
-        # tla = re.findall("(?=( [A-Z]{3}[\s]))", message)  # ThreeLetterAcronym
         msg_start = re.findall("[A-Z]+ ", message)[0]
         message = message[len(msg_start):]
         msg_start = msg_start.strip()
@@ -214,10 +213,6 @@ class Operator():
         enc_msg_key = enc_msg_key.strip()
         # msg_start_list = msg_start.replace("", " ").split()
         # print(enc_msg_key, message)
-
-        # message = message[len(tla[0]) + len(tla[1]) - 1:]
-        # Subtract 1 because the space between the two tla is counted twice.
-        # message = message[:]
 
         # What is left of the message is what is counted in the message lenght
         actual_message_length = len(message.replace(" ", ""))
@@ -553,8 +548,7 @@ class Enigma_M3():
             Key object containing, well, key information.
 
         """
-        # TODO for i in range(len(key[0])):
-        # Make the number of active rotors adjustable.
+        # Setting up the hardware
         self.rotorlist = []
         # print(key)
         # print(key.rotors)
@@ -565,16 +559,6 @@ class Enigma_M3():
                         key.rings[n])
             self.rotorlist.append(rot)
         # print(self.rotorlist)
-        # Setting up the hardware
-        # # Left rotor
-        # self.lft = Rotor(self._rotors[key.rotors[0]],
-        #                  key.starts[0], key.rings[0])
-        # # Middle rotor
-        # self.mid = Rotor(self._rotors[key.rotors[1]],
-        #                  key.starts[1], key.rings[1])
-        # # Right rotor
-        # self.rgt = Rotor(self._rotors[key.rotors[2]],
-        #                  key.starts[2], key.rings[2])
         # Reflector
         self.ref = Reflector(self._reflectors[key.refl])
         # Plugbord
@@ -609,31 +593,8 @@ class Enigma_M3():
         for n in range(len(self.rotorlist)):
             pos.append(self.rotorlist[n].get_position())
 
-        # _ = self.lft.get_position()
-        # posM = self.mid.get_position()
-        # posR = self.rgt.get_position()
-
         # Turn rotors appropriately
         for ch in text:
-            # # print(ch, end=" ")
-            # # The right rotor turns before the letter is processed.
-            # posR = self.rgt.turn()
-            # # If a rotor is in its notch position, it advances
-            # # and so does the rotor to its left.
-            # if posM + 1 in self.mid.get_notch():
-            #     # Double stepping
-            #     print("mid.notch")
-            #     posM = self.mid.turn()
-            #     print("mid.turn")
-            #     _ = self.lft.turn()
-            #     print("lft.turn")
-            # if posR in self.rgt.get_notch():
-            #     # Checking for posR, not posR+1
-            #     # because the right rotor has already stepped.
-            #     print("rgt.notch")
-            #     posM = self.mid.turn()
-            #     print("mid.turn")
-
             pos[-1] = self.rotorlist[-1].turn()
             if pos[-1] in self.rotorlist[-1].get_notch():
                 # Treating the rightmost rotor separately
@@ -649,63 +610,35 @@ class Enigma_M3():
                     pos[n] = self.rotorlist[n].turn()
                     pos[n - 1] = self.rotorlist[n - 1].turn()
 
-            #         pass
-
             # Print rotor positions
             if verbose:
                 for rotor in self.rotorlist:
                     print(chr(rotor.get_position()+65), end =" ")
-                # pass
-                # self.print_pos(self.lft, self.mid, self.rgt, end="   ")
 
             # Encipher text
             if verbose:
                 print(f"  {ch}  ", end="")
             ch = self.plg.vor(ch)
             if verbose:
-                print(f"-> {ch} ", end="")
-            for i in range(len(self.rotorlist)-1, -1, -1):
+                print(f"> {ch} ", end="")
+            for i in range(len(self.rotorlist) - 1, -1, -1):
                 ch = self.rotorlist[i].vor(ch)
                 if verbose:
-                    print(f"-> {ch} ", end="")
-            # ch = self.rgt.vor(ch)
-            # if verbose:
-            #     print(f"-> {ch} ", end="")
-            # ch = self.mid.vor(ch)
-            # if verbose:
-            #     print(f"-> {ch} ", end="")
-            # ch = self.lft.vor(ch)
-            # if verbose:
-            #     print(f"-> {ch} ", end="")
+                    print(f"> {ch} ", end="")
             ch = self.ref.vor(ch)
             if verbose:
-                print(f"->  {ch}  ", end="")
+                print(f">R> {ch} ", end="")
             for i in range(len(self.rotorlist)):
                 # print(i, end="")
                 ch = self.rotorlist[i].ruck(ch)
                 if verbose:
-                    print(f"-> {ch} ", end="")
-            # ch = self.lft.ruck(ch)
-            # if verbose:
-            #     print(f"-> {ch} ", end="")
-            # ch = self.mid.ruck(ch)
-            # if verbose:
-            #     print(f"-> {ch} ", end="")
-            # ch = self.rgt.ruck(ch)
-            # if verbose:
-            #     print(f"-> {ch} ", end="")
+                    print(f"> {ch} ", end="")
             ch = self.plg.ruck(ch)
             if verbose:
-                print(f"->  {ch}")
+                print(f">  {ch}")
 
             cipher += ch
         return cipher
-
-    def print_pos(self, lef, mid, rgt, end="\n"):
-        """Print current positions of the rotors."""
-        print(chr(lef.get_position() + 65) + " "
-              + chr(mid.get_position() + 65) + " "
-              + chr(rgt.get_position() + 65), end=end)
 
 
 class Disk():
