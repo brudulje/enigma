@@ -13,10 +13,10 @@ def main():
     """Execute enigma program."""
     recipient = "ABC"
     sender = "QRSTU"
-    # message = "Skal vi se da funker det Jeg vil ha mer"
-    message = "ABC QRSTU 2259 = 35 = DITGSSV ESLSTNW HWMUF NFYFB JCTLJ BOVCT MNSKQ MYUKA DCHGX"
-    # encipher = True
-    encipher = False
+    message = "Skal vi se da funker det Jeg vil ha mer"#.upper()
+    # message = "ABC QRSTU 2259 = 35 = DITGSSV ESLSTNW HWMUF NFYFB JCTLJ BOVCT MNSKQ MYUKA DCHGX"
+    encipher = True
+    # encipher = False
     date = None
     month = None
     verbose = False  # For debugging
@@ -48,7 +48,9 @@ class Operator():
     """Emulates the operator of the Enigma M3."""
 
     def __init__(self):
-        self._alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
+        # self._alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")#.replace("", " ").split()
+        # self._alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split()
+        self._alphabet = list("!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÁÉÍÏÐÓÞÆÄØÖÅáéíïðóþæäøöåßΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя")
         # TODO : See if this can be coded in only one single place.
 
     def encipher(self, message, recipient="ABC", sender="QRS",
@@ -116,7 +118,8 @@ class Operator():
             msg_start = ''.join(secrets.choice(self._alphabet)
                                 for i in range(number_of_rotors))
             # print(msg_start)
-            msg_start_list = msg_start.replace("", " ").split()
+            # msg_start_list = msg_start.replace("", " ").split()
+            msg_start_list = list(msg_start)#.replace("", " ").split()
             # print(f"{msg_start_list=}.")
 
             key.starts = msg_start_list
@@ -126,7 +129,8 @@ class Operator():
             # choose random message key (3 letters)
             msg_key = ''.join(secrets.choice(self._alphabet)
                               for i in range(number_of_rotors))
-            msg_key_list = msg_key.replace("", " ").split()
+            # msg_key_list = msg_key.replace("", " ").split()
+            msg_key_list = list(msg_key)#.replace("", " ").split()
             enc_msg_key = enigma.process(msg_key, verbose=verbose)
             # print(f"{enc_msg_key=}.")
             key.starts = msg_key_list
@@ -358,14 +362,15 @@ class Operator():
         # It was prohibited to encipher the word "NULL" several times in a row,
         # so they used CENTA (00), MILLE (000) and MYRIA (0000).
         # Some examples: 200 = ZWO CENTA, 00780 = CENTA SIEBEN AQT NULL.
-
-        s = s.replace("", " ").split()
+        # print(s)
+        # s = s.replace("", " ").split()
+        s = list(s)
+        # print(s)
         for i, letter in enumerate(s):
             # print(i, s[i])
-            if letter.upper() in self._alphabet \
-               or letter in self._alphabet:
+            if letter in self._alphabet:
                 # Lower case letter or upper case letter
-                s[i] = letter.upper()
+                s[i] = letter
             elif letter == ".":
                 s[i] = "X"
             elif letter == ",":
@@ -458,7 +463,7 @@ class Operator():
                     s.insert(i, "NULL")
             else:
                 # Discard all else
-                print(f"Character not allowed. Discarded character: {s[i]}")
+                print(f"Character not allowed. Discarded character: '{s[i]}'")
                 s[i] = ""
 
         return "".join(s)
@@ -520,9 +525,12 @@ class Enigma_M3():
     _rotors = {
         # rotor = ["name", "cipher alpha", [notches]]
         "0": ["0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
-        "I": ["I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q"]],  # Q = 17
-        "II": ["II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E"]],  # E = 05
-        "III": ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V"]],  # V = 22
+        # "I": ["I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q"]],  # Q = 17
+        # "II": ["II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E"]],  # E = 05
+        # "III": ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V"]],  # V = 22
+        "I": ['I', 'hтΔнÖtSp$фм#гοéпИðГ(Ы\'УäиЯ^ОåaаΞηЮХló<Ζ}C]Аyёюx"WLЩAцоgνкRя:ЧJΘСΦвγ5ΣЗ?%ΝÄΜъ7dNïэτ8ιKψН*|YЁá13),.&v@ÐαВkΚКдVFÁйeЭЖMβÓЛР+öυμf/χÏφЙQ6IщΩЦøΑXδsωmεΛσлoБеМ~жШλz-ΙΓθæØHДухΠ\\GЕÍwπПZÆ>Χзш[ФрíOκBбc_þ=jbыTÅ{Β!Ε4Т;ζrEЪΡDξiчсΤqь0ß`29ΟÞPΨnΥuЬΗUρÉ', ['$', '(', ')', ',', '-', '6', '9', ';', '<', 'D', 'F', 'I', 'K', 'M', 'N', 'R', 'Y', '[', '_', 'b', 'j', 'o', 'r', 's', '{', 'Í', 'Ä', 'Ö', 'á', 'í', 'ï', 'ä', 'Β', 'Δ', 'Λ', 'Π', 'Τ', 'Χ', 'Ω', 'ε', 'ζ', 'ν', 'ο', 'χ', 'ω', 'А', 'Д', 'К', 'М', 'П', 'Р', 'Я', 'м', 'о', 'п', 'у', 'ч', 'ш', 'ъ', 'э', 'ю', 'я']],
+        "II": ['II', 'НβÞnö@Ζ`fDАдΘжч)Εå4Qθы+МXκwíáPχ~ΣdΤψÏMÓζσЗÖрнbоtёпH!\\NЬД^9Aиф?ιlω]øЪс$ΠцхÍTΒsgΥукΑzЫqεОcΨл;ΓГηiτ-ΛЛBΟδ#λЮРξEΙС5ЯUщæΔΧÆGУΞZaзïυ3}ТY|еэKÅбъЧ&гм(WSuðφÉkΗοÁЖЕя{=ß[eΝвo.Oνа2*mrIxИpy"ΩL<6юБμПЙШhФJΡьVΚØCВρ>0FЩЁΦЦш1γЭ8:ó,jΜþ_й7КR/тv%Ðä\'πÄéХα', ['!', '"', '#', '&', "'", ',', '.', '/', '4', '5', '7', '8', 'E', 'G', 'J', 'K', 'N', 'R', 'Y', '\\', '^', 'c', 'd', 'h', 'p', 'q', 't', 'v', 'É', 'Þ', 'Æ', 'Ä', 'á', 'é', 'ó', 'æ', 'Α', 'Γ', 'Θ', 'Λ', 'Ν', 'Ο', 'Χ', 'Ω', 'α', 'β', 'δ', 'ε', 'ζ', 'ξ', 'ρ', 'σ', 'τ', 'χ', 'Б', 'Г', 'Д', 'Й', 'Л', 'М', 'Р', 'У', 'Ф', 'Х', 'Ш', 'Ю', 'д', 'з', 'с', 'т', 'ц', 'ъ', 'ы', 'ю']],
+        "III": ['III', '=ΦΡUΣИОЁδсfчRLэQéКóbt*ЖOυ;íΩ:äeРιоюр,Ï&φХαЩgøβжЛшЦYjξΤпxΓтМхψPаНÍЗАÖΕСиТ8#{οos9яΑΝwTΞΚAьD"ПuNχJЯ[Λν!ÐΔWmτΘЬ/3ΥВ]ρЙþ>κØ%ωðΒ`5Á$Ævæб(Г1Vσ?kKЪ6μ.HcáБй7É0ΟnЭ+åн)d\\ßУЫöзEÓIrеqπ|ЮiFaΠг@XpлC4ЧΜ~ïДÅΗγεÞд2ZSθфlцвёGШB\'щыζ<-zФÄкλhΙΧ^_мηЕyΨъ}ΖMу', ['!', '$', '&', "'", '*', '.', '/', '1', '4', '8', ':', 'B', 'E', 'F', 'G', 'J', 'K', 'M', 'O', 'R', 'W', 'X', 'Y', '\\', 'm', 'o', 'p', 'q', 'r', 'u', 'v', 'y', '}', 'Í', 'Ð', 'Æ', 'Ä', 'Å', 'ø', 'å', 'Δ', 'Ζ', 'Η', 'Ξ', 'Φ', 'Ω', 'ζ', 'μ', 'ξ', 'ο', 'σ', 'φ', 'ψ', 'Б', 'Д', 'И', 'К', 'Н', 'П', 'Р', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Ъ', 'а', 'б', 'и', 'к', 'л', 'н', 'о', 'т', 'у', 'ч', 'щ', 'ъ', 'э']],
         "IV": ["IV", "ESOVPZJAYQUIRHXLNFTGKDCMWB", ["J"]],  # J = 10
         "V": ["V", "VZBRGITYUPSDNHLXAWMJQOFECK", ["Z"]],  # Z = 26
         # Rotors VI - VIII only on Enigma M3, not on the Enigma I.
@@ -645,11 +653,14 @@ class Disk():
     """A parent class for the rotors and reflectors."""
 
     def __init__(self, name, wires):
-        self._alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
+        # self._alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")#.replace("", " ").split()
+        self._alphabet = list("!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÁÉÍÏÐÓÞÆÄØÖÅáéíïðóþæäøöåßΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя")
         self._name = name
         self._wires = wires
         self._alpha_plain = self._alphabet[:]
-        self._alpha_vor = self._wires.replace("", " ").split()
+        # self._alpha_vor = self._wires.replace("", " ").split()
+        self._alpha_vor = list(self._wires)#.replace("", " ").split()
+        # print(f"Disk.__init__ {type(self._alpha_vor)}")
         self._alpha_ruck = self._alphabet[:]
         self.set_ruck()
 
@@ -778,11 +789,13 @@ class Plugboard():
 
     def __init__(self, connections):
         # The plain alphabet
-        self._alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".replace("", " ").split()
+        # self._alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")#.replace("", " ").split()
+        self._alphabet = list("!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÁÉÍÏÐÓÞÆÄØÖÅáéíïðóþæäøöåßΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя")
         self._alpha_plain = self._alphabet[:]
         self._alpha_vor = self._alphabet[:]
         self._sanity_check(connections)
         self.connections = connections.split()  # .replace(".", " ").split()
+        print(f"Plugboard.__init__ {self.connections}{type(self.connections)}")
 
         # Build the _alpha_vor
         while len(self.connections) > 0:  # Until the list is empty
