@@ -9,17 +9,18 @@ import re
 import secrets
 
 
+
 def main():
     """Execute enigma program."""
     recipient = "ABC"
     sender = "QRSTU"
-    message = "Skal vi se da funker det Jeg vil ha mer"#.upper()
-    # message = "ABC QRSTU 2259 = 35 = DITGSSV ESLSTNW HWMUF NFYFB JCTLJ BOVCT MNSKQ MYUKA DCHGX"
-    encipher = True
-    # encipher = False
+    # message = "Skal vi se da funker det Jeg vil ha mer"#.upper()
+    message = "ABC QRSTU 2116 = 35 = ᛒᚼΧ ъеX Ö2KCW X+ьD4 hΩгΕ1 эhΩЗё ᛒπρйT Xоðζμ ᛋ-Αф$"
+    # encipher = True
+    encipher = False
     date = None
     month = None
-    verbose = False  # For debugging
+    verbose = True  # For debugging
 
     op = Operator()
     if encipher:  # Encipher message
@@ -48,10 +49,7 @@ class Operator():
     """Emulates the operator of the Enigma M3."""
 
     def __init__(self):
-        # self._alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")#.replace("", " ").split()
-        # self._alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split()
-        self._alphabet = list("!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÁÉÍÏÐÓÞÆÄØÖÅáéíïðóþæäøöåßΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя")
-        # TODO : See if this can be coded in only one single place.
+        self._alphabet = list(alphabet)
 
     def encipher(self, message, recipient="ABC", sender="QRS",
                  date=None, verbose=False):
@@ -183,12 +181,12 @@ class Operator():
         # print(message)
 
         # Find recipient
-        recipient = re.findall("[A-Z]+ ", message)[0]
+        recipient = re.findall("[A-Za-z]+ ", message)[0]
         message = message[len(recipient):]
         recipient = recipient.strip()
         # print(recipient, message)
         # Find sender
-        sender = re.findall("[A-Z]+ ", message)[0]
+        sender = re.findall("[A-Za-z]+ ", message)[0]
         message = message[len(sender):]
         sender = sender.strip()
         # print(sender, message)
@@ -207,12 +205,12 @@ class Operator():
         # print(length, message)
         # Find message start pos
         # Find enciphered message key
-        msg_start = re.findall("[A-Z]+ ", message)[0]
+        msg_start = re.findall("[\S]+ ", message)[0]
         message = message[len(msg_start):]
         msg_start = msg_start.strip()
         # print(msg_start, message)
 
-        enc_msg_key = re.findall("[A-Z]+ ", message)[0]
+        enc_msg_key = re.findall("[\S]+ ", message)[0]
         message = message[len(enc_msg_key) + 1:]
         enc_msg_key = enc_msg_key.strip()
         # msg_start_list = msg_start.replace("", " ").split()
@@ -231,7 +229,7 @@ class Operator():
 
         # Find kenngruppen
         # Kenngruppen is the last three letters in the first five-letter group.
-        kenngruppen = re.search("[A-Z]{5} ", message)[0][2:-1]
+        kenngruppen = re.search("[\S]{5} ", message)[0][2:-1]
 
         # Look up key in book
         key, date = self.get_daykey(kenngruppen, month=month)
@@ -524,13 +522,13 @@ class Enigma_M3():
     """Emulates the Enigma M3 machine."""
     _rotors = {
         # rotor = ["name", "cipher alpha", [notches]]
-        "0": ["0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
+        # "0": ["0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
         # "I": ["I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q"]],  # Q = 17
         # "II": ["II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E"]],  # E = 05
         # "III": ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V"]],  # V = 22
-        "I": ['I', 'hтΔнÖtSp$фм#гοéпИðГ(Ы\'УäиЯ^ОåaаΞηЮХló<Ζ}C]Аyёюx"WLЩAцоgνкRя:ЧJΘСΦвγ5ΣЗ?%ΝÄΜъ7dNïэτ8ιKψН*|YЁá13),.&v@ÐαВkΚКдVFÁйeЭЖMβÓЛР+öυμf/χÏφЙQ6IщΩЦøΑXδsωmεΛσлoБеМ~жШλz-ΙΓθæØHДухΠ\\GЕÍwπПZÆ>Χзш[ФрíOκBбc_þ=jbыTÅ{Β!Ε4Т;ζrEЪΡDξiчсΤqь0ß`29ΟÞPΨnΥuЬΗUρÉ', ['$', '(', ')', ',', '-', '6', '9', ';', '<', 'D', 'F', 'I', 'K', 'M', 'N', 'R', 'Y', '[', '_', 'b', 'j', 'o', 'r', 's', '{', 'Í', 'Ä', 'Ö', 'á', 'í', 'ï', 'ä', 'Β', 'Δ', 'Λ', 'Π', 'Τ', 'Χ', 'Ω', 'ε', 'ζ', 'ν', 'ο', 'χ', 'ω', 'А', 'Д', 'К', 'М', 'П', 'Р', 'Я', 'м', 'о', 'п', 'у', 'ч', 'ш', 'ъ', 'э', 'ю', 'я']],
-        "II": ['II', 'НβÞnö@Ζ`fDАдΘжч)Εå4Qθы+МXκwíáPχ~ΣdΤψÏMÓζσЗÖрнbоtёпH!\\NЬД^9Aиф?ιlω]øЪс$ΠцхÍTΒsgΥукΑzЫqεОcΨл;ΓГηiτ-ΛЛBΟδ#λЮРξEΙС5ЯUщæΔΧÆGУΞZaзïυ3}ТY|еэKÅбъЧ&гм(WSuðφÉkΗοÁЖЕя{=ß[eΝвo.Oνа2*mrIxИpy"ΩL<6юБμПЙШhФJΡьVΚØCВρ>0FЩЁΦЦш1γЭ8:ó,jΜþ_й7КR/тv%Ðä\'πÄéХα', ['!', '"', '#', '&', "'", ',', '.', '/', '4', '5', '7', '8', 'E', 'G', 'J', 'K', 'N', 'R', 'Y', '\\', '^', 'c', 'd', 'h', 'p', 'q', 't', 'v', 'É', 'Þ', 'Æ', 'Ä', 'á', 'é', 'ó', 'æ', 'Α', 'Γ', 'Θ', 'Λ', 'Ν', 'Ο', 'Χ', 'Ω', 'α', 'β', 'δ', 'ε', 'ζ', 'ξ', 'ρ', 'σ', 'τ', 'χ', 'Б', 'Г', 'Д', 'Й', 'Л', 'М', 'Р', 'У', 'Ф', 'Х', 'Ш', 'Ю', 'д', 'з', 'с', 'т', 'ц', 'ъ', 'ы', 'ю']],
-        "III": ['III', '=ΦΡUΣИОЁδсfчRLэQéКóbt*ЖOυ;íΩ:äeРιоюр,Ï&φХαЩgøβжЛшЦYjξΤпxΓтМхψPаНÍЗАÖΕСиТ8#{οos9яΑΝwTΞΚAьD"ПuNχJЯ[Λν!ÐΔWmτΘЬ/3ΥВ]ρЙþ>κØ%ωðΒ`5Á$Ævæб(Г1Vσ?kKЪ6μ.HcáБй7É0ΟnЭ+åн)d\\ßУЫöзEÓIrеqπ|ЮiFaΠг@XpлC4ЧΜ~ïДÅΗγεÞд2ZSθфlцвёGШB\'щыζ<-zФÄкλhΙΧ^_мηЕyΨъ}ΖMу', ['!', '$', '&', "'", '*', '.', '/', '1', '4', '8', ':', 'B', 'E', 'F', 'G', 'J', 'K', 'M', 'O', 'R', 'W', 'X', 'Y', '\\', 'm', 'o', 'p', 'q', 'r', 'u', 'v', 'y', '}', 'Í', 'Ð', 'Æ', 'Ä', 'Å', 'ø', 'å', 'Δ', 'Ζ', 'Η', 'Ξ', 'Φ', 'Ω', 'ζ', 'μ', 'ξ', 'ο', 'σ', 'φ', 'ψ', 'Б', 'Д', 'И', 'К', 'Н', 'П', 'Р', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Ъ', 'а', 'б', 'и', 'к', 'л', 'н', 'о', 'т', 'у', 'ч', 'щ', 'ъ', 'э']],
+        "I": ['I', 'Ζ<хВгχR=|йÏqdmAφ[Τ&νЖ"ρåпÖАᛦVᛯᚱaδ+,лМᚾοᛒLíMElZΜfΦᛗgeСxᛊБtsTDЗᛏᚦя\\YiυУΧЁvу>ᛜGРᚴФ]äÄЪ6НUИ_ÅbÉᚠΚΑτᛮᚬNΔᛇïΞλΠΟᛉ(ΙЭÞι`KΣ\'ΓЫоSη:)здЧиPᛅQn#μJáᚲκквюышcᛁ0CαЮГþθzo9r2jᛈyξмᛰΘёчᚺХ4O$σКζэóбhΝÓHᛃ53ÐфωрᚢIγЦᛖ@FЙ;Ηц/*аᛚΩð7ъЕО~1ΛЛᛘpтψ{Д.ᛋBᛞWн}ÁuÆᚹæΒ8еᚨᛟΡТж%π-Ε?ЬØøьЩᚼщΨᚷсöÍ!ΥXβШεПékw^Я', ['!', '#', '%', ',', '/', '1', '2', '6', '9', 'A', 'F', 'L', 'M', 'N', 'U', 'Y', '[', '^', '`', 'a', 'e', 'w', 'É', 'Ó', 'Þ', 'Æ', 'Å', 'í', 'ï', 'æ', 'ø', 'ö', 'Α', 'Ζ', 'Η', 'Θ', 'Λ', 'Σ', 'Χ', 'Ψ', 'ι', 'κ', 'λ', 'μ', 'ξ', 'ο', 'ρ', 'υ', 'А', 'Г', 'Е', 'К', 'М', 'Н', 'Ф', 'Ц', 'Ь', 'Ю', 'Я', 'в', 'г', 'д', 'з', 'й', 'н', 'с', 'у', 'х', 'ч', 'ш', 'ъ', 'я', 'ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚲ', 'ᚺ', 'ᛁ', 'ᛃ', 'ᛅ', 'ᛈ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛗ', 'ᛘ', 'ᛟ', 'ᛦ']],
+        "II": ['II', 'Pцо1rsЧÍΝUуGΓ/cσ"ᛞþᛋmψðεV2ᛜC$n0ΤLΦNъыЙкυÉФÁΥγxwf&åR{u(иαЮIÅΩeκМЬᚲØθс-d6ᛦ#.яAiFСΛᚹDᛯК3Щюοх5ζX+7WΠᛇеᛖЫδφΣᚠ]УмqᚼΧ9ÄHZчшτΞhᛘΡïᛉgᛰ)В^ᛮЭΔЖlχщфΖj<ÞᚨЗπ_%ЯНИрΘ*эᚺΚΟY~Рёpᛈ[νᚦ}ᚷztωжтпΑᛃΨбЪᛚBБÆ\'лμГ!ᚾ=æJ\\ιákTᚢéгᛗEΒᛏξзᚴЁДÓвОλÏ>KдρbХПΜ`ÖvηóᛟΙаOayᛒ4ᛅ8ШM,;нβЕьΗА@ЦᛊQᚬÐ|:SΕøoäöᚱйᛁЛ?íТ', ['"', '$', '&', '0', '4', '6', '9', '=', '@', 'B', 'D', 'E', 'F', 'J', 'L', 'P', 'Q', 'S', 'U', 'W', 'Z', '^', 'p', 'q', 's', 'w', '|', 'Í', 'Ï', 'Þ', 'Ø', 'ö', 'å', 'Α', 'Γ', 'Ι', 'Ξ', 'Ο', 'Ρ', 'Ω', 'γ', 'ι', 'ο', 'π', 'Д', 'Е', 'Н', 'С', 'Ф', 'Ч', 'Ш', 'Ы', 'Э', 'Ю', 'д', 'ё', 'ф', 'х', 'ы', 'ᚢ', 'ᚦ', 'ᚱ', 'ᚲ', 'ᛇ', 'ᛈ', 'ᛖ', 'ᛗ', 'ᛘ', 'ᛜ', 'ᛯ', 'ᛰ']],
+        "III": ['III', ':ᚺYhᚾLЬвRεðкΗᛉχЕAτбEЖΚΣ6чᛜαΧиÓᚨзᛁᛖ<ïΥXпνᛊøъС^ᛞξЧ9ΓÄ;ГТΟΦ7ЮIᚦШΔ>οΕδᚼΤᛚЭПPB`ᛮ!тÅβеyΩJtдpЪWш]ЗiЩ_í|wРрΠäИхᛇσ=УujаVéΘÐqψ(ΞᛋᚬáGγÁÍl#DМsНщócоΙeæцþВöмåKÖᛦιzфйÆμ0АΒЛᚢКᚠυэoжᛒᚴО"{πθ~ХΜᚲДΑ*5Фη}\\ᚷgÞᚹCЫρЙQᛘЯ3\'&Ρ-Z.8SлᛏU2сᚱЦг/нᛯr$ΝьёOζЁΛᛃΖb[Éωᛈx)%ΨκÏT1FюvMHБ+Nу@?dmыaᛅ4nf,λφkᛰᛗᛟяØ', ['"', '#', '&', '(', '*', '+', '-', '/', '2', '@', 'A', 'C', 'D', 'E', 'K', 'L', 'P', 'R', 'S', 'T', 'V', '\\', 'd', 'j', 's', '{', 'Ï', 'Ð', 'Å', 'í', 'ï', 'ä', 'Δ', 'Ι', 'Κ', 'Ν', 'Ξ', 'Ο', 'Ρ', 'Τ', 'Φ', 'Χ', 'Ψ', 'γ', 'ε', 'χ', 'Г', 'И', 'Й', 'П', 'Р', 'Ф', 'Ш', 'Ъ', 'Ю', 'Я', 'в', 'е', 'ж', 'и', 'л', 'о', 'у', 'ф', 'ш', 'ю', 'я', 'ᚢ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚼ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛘ', 'ᛦ', 'ᛯ']],
         "IV": ["IV", "ESOVPZJAYQUIRHXLNFTGKDCMWB", ["J"]],  # J = 10
         "V": ["V", "VZBRGITYUPSDNHLXAWMJQOFECK", ["Z"]],  # Z = 26
         # Rotors VI - VIII only on Enigma M3, not on the Enigma I.
@@ -542,7 +540,9 @@ class Enigma_M3():
     _reflectors = {
         "A": ["A", "EJMZALYXVBWFCRQUONTSPIKHGD"],\
         # reflB is standard on Enigma I.
-        "B": ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"],\
+        # "B": ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"],\
+        "B": ["B", "ᛰᛯᛮᛦᛟᛞᛜᛚᛘᛗᛖᛒᛏᛋᛊᛉᛈᛇᛅᛃᛁᚾᚼᚺᚹᚷᚴᚲᚱᚬᚨᚦᚢᚠяюэьыъщшчцхфутсрпонмлкйизжёедгвбаЯЮЭЬЫЪЩШЧЦХФУТСРПОНМЛКЙИЗЖЁЕДГВБАωψχφυτσρποξνμλκιθηζεδγβαΩΨΧΦΥΤΣΡΠΟΞΝΜΛΚΙΘΗΖΕΔΓΒΑåöøäæþóðïíéáÅÖØÄÆÞÓÐÏÍÉÁ~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543210/.-,+*)('&%$#\"!"],
+        # B is a simple atbash for now.
         "C": ["C", "FVPJIAOYEDRZXWGCTKUQSBNMHL"],\
     }
 
@@ -653,8 +653,7 @@ class Disk():
     """A parent class for the rotors and reflectors."""
 
     def __init__(self, name, wires):
-        # self._alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")#.replace("", " ").split()
-        self._alphabet = list("!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÁÉÍÏÐÓÞÆÄØÖÅáéíïðóþæäøöåßΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя")
+        self._alphabet = list(alphabet)
         self._name = name
         self._wires = wires
         self._alpha_plain = self._alphabet[:]
@@ -689,7 +688,8 @@ class Disk():
     def set_ruck(self):
         """Build the backward substitution alphabet."""
         for i, l in enumerate(self._alpha_plain):
-            self._alpha_ruck[i] = self._alpha_plain[self._alpha_vor.index(l)]
+            self._alpha_ruck[i] = \
+                self._alpha_plain[self._alpha_vor.index(l)]
 
 
 class Rotor(Disk):
@@ -788,14 +788,11 @@ class Plugboard():
     """The plugboard just after the keyboard and just before the lamps."""
 
     def __init__(self, connections):
-        # The plain alphabet
-        # self._alphabet = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")#.replace("", " ").split()
-        self._alphabet = list("!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}~ÁÉÍÏÐÓÞÆÄØÖÅáéíïðóþæäøöåßΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψωАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя")
+        self._alphabet = list(alphabet)
         self._alpha_plain = self._alphabet[:]
         self._alpha_vor = self._alphabet[:]
         self._sanity_check(connections)
         self.connections = connections.split()  # .replace(".", " ").split()
-        print(f"Plugboard.__init__ {self.connections}{type(self.connections)}")
 
         # Build the _alpha_vor
         while len(self.connections) > 0:  # Until the list is empty
@@ -839,6 +836,32 @@ class Plugboard():
         """Substitute letter, according to plugboard setting."""
         # Plugboard is symmetric.
         return self.vor(ch)
+
+
+def choose_letters():
+    a0 = "!\"#$%&'()*+,-./0123456789:;<=>?@"
+    a3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`"
+    a5 = "abcdefghijklmnopqrstuvwxyz{|}~"
+
+    a7 = "\u00c1\u00c9\u00cd\u00cf\u00d0\u00d3\u00deÆÄØÖÅ\u00e1\u00e9\u00ed\u00ef\u00f0\u00f3\u00feæäøöå"
+
+    a8 = "\u00df"
+
+    a9 = "\u0391\u0392\u0393\u0394\u0395\u0396\u0397\u0398\u0399\u039a\u039b\u039c\u039d\u039e\u039f\u03a0\u03a1\u03a3\u03a4\u03a5\u03a6\u03a7\u03a8\u03a9"
+    a10 = "\u03b1\u03b2\u03b3\u03b4\u03b5\u03b6\u03b7\u03b8\u03b9\u03ba\u03bb\u03bc\u03bd\u03be\u03bf\u03c0\u03c1\u03c3\u03c4\u03c5\u03c6\u03c7\u03c8\u03c9"
+
+    a11 = "\u0410\u0411\u0412\u0413\u0414\u0415\u0401\u0416\u0417\u0418\u0419\u041a\u041b\u041c\u041d\u041e\u041f\u0420\u0421\u0422\u0423\u0424\u0425\u0426\u0427\u0428\u0429\u042a\u042b\u042c\u042d\u042e\u042f"
+    a13 = "\u0430\u0431\u0432\u0433\u0434\u0435\u0451\u0436\u0437\u0438\u0439\u043a\u043b\u043c\u043d\u043e\u043f\u0440\u0441\u0442\u0443\u0444\u0445\u0446\u0447\u0448\u0449\u044a\u044b\u044c\u044d\u044e\u044f"
+
+    a14 = "\u16a0\u16a2\u16a6\u16a8\u16ac\u16b1\u16b2\u16b4\u16b7\u16b9\u16ba\u16bc\u16be\u16c1\u16c3\u16c5\u16c7\u16c8\u16c9\u16ca\u16cb\u16cf\u16d2\u16d6\u16d7\u16d8\u16da\u16dc\u16de\u16df\u16e6\u16ee\u16ef\u16f0"
+
+    asciiChars = a0 + a3 + a5
+    nordic = a7  # + a8
+    greek = a9 + a10
+    russian = a11 + a13
+    runes = a14
+    return asciiChars + nordic + greek + russian + runes
+alphabet = choose_letters()
 
 
 if __name__ == "__main__":
