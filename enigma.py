@@ -14,10 +14,10 @@ def main():
     """Execute enigma program."""
     recipient = "ABC"
     sender = "QRSTU"
-    # message = "Skal vi se da funker det Jeg vil ha mer"#.upper()
-    message = "ABC QRSTU 2116 = 35 = ᛒᚼΧ ъеX Ö2KCW X+ьD4 hΩгΕ1 эhΩЗё ᛒπρйT Xоðζμ ᛋ-Αф$"
-    # encipher = True
-    encipher = False
+    message = "Skal vi se da funker det Jeg vil ha mer".upper()
+    # message = "ABC QRSTU 2026 = 35 = X9Β ᚹØᛞ ØᚢUKM ᛋΞᛯZΝ Ð8сΖᛰ RДнᛯΓ gᚷᚦΚᚠ /Оo{Í ᚲÓ7Y~"
+    encipher = True
+    # encipher = False
     date = None
     month = None
     verbose = True  # For debugging
@@ -523,12 +523,12 @@ class Enigma_M3():
     _rotors = {
         # rotor = ["name", "cipher alpha", [notches]]
         # "0": ["0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
-        # "I": ["I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q"]],  # Q = 17
-        # "II": ["II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E"]],  # E = 05
-        # "III": ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V"]],  # V = 22
-        "I": ['I', 'Ζ<хВгχR=|йÏqdmAφ[Τ&νЖ"ρåпÖАᛦVᛯᚱaδ+,лМᚾοᛒLíMElZΜfΦᛗgeСxᛊБtsTDЗᛏᚦя\\YiυУΧЁvу>ᛜGРᚴФ]äÄЪ6НUИ_ÅbÉᚠΚΑτᛮᚬNΔᛇïΞλΠΟᛉ(ΙЭÞι`KΣ\'ΓЫоSη:)здЧиPᛅQn#μJáᚲκквюышcᛁ0CαЮГþθzo9r2jᛈyξмᛰΘёчᚺХ4O$σКζэóбhΝÓHᛃ53ÐфωрᚢIγЦᛖ@FЙ;Ηц/*аᛚΩð7ъЕО~1ΛЛᛘpтψ{Д.ᛋBᛞWн}ÁuÆᚹæΒ8еᚨᛟΡТж%π-Ε?ЬØøьЩᚼщΨᚷсöÍ!ΥXβШεПékw^Я', ['!', '#', '%', ',', '/', '1', '2', '6', '9', 'A', 'F', 'L', 'M', 'N', 'U', 'Y', '[', '^', '`', 'a', 'e', 'w', 'É', 'Ó', 'Þ', 'Æ', 'Å', 'í', 'ï', 'æ', 'ø', 'ö', 'Α', 'Ζ', 'Η', 'Θ', 'Λ', 'Σ', 'Χ', 'Ψ', 'ι', 'κ', 'λ', 'μ', 'ξ', 'ο', 'ρ', 'υ', 'А', 'Г', 'Е', 'К', 'М', 'Н', 'Ф', 'Ц', 'Ь', 'Ю', 'Я', 'в', 'г', 'д', 'з', 'й', 'н', 'с', 'у', 'х', 'ч', 'ш', 'ъ', 'я', 'ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚲ', 'ᚺ', 'ᛁ', 'ᛃ', 'ᛅ', 'ᛈ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛗ', 'ᛘ', 'ᛟ', 'ᛦ']],
-        "II": ['II', 'Pцо1rsЧÍΝUуGΓ/cσ"ᛞþᛋmψðεV2ᛜC$n0ΤLΦNъыЙкυÉФÁΥγxwf&åR{u(иαЮIÅΩeκМЬᚲØθс-d6ᛦ#.яAiFСΛᚹDᛯК3Щюοх5ζX+7WΠᛇеᛖЫδφΣᚠ]УмqᚼΧ9ÄHZчшτΞhᛘΡïᛉgᛰ)В^ᛮЭΔЖlχщфΖj<ÞᚨЗπ_%ЯНИрΘ*эᚺΚΟY~Рёpᛈ[νᚦ}ᚷztωжтпΑᛃΨбЪᛚBБÆ\'лμГ!ᚾ=æJ\\ιákTᚢéгᛗEΒᛏξзᚴЁДÓвОλÏ>KдρbХПΜ`ÖvηóᛟΙаOayᛒ4ᛅ8ШM,;нβЕьΗА@ЦᛊQᚬÐ|:SΕøoäöᚱйᛁЛ?íТ', ['"', '$', '&', '0', '4', '6', '9', '=', '@', 'B', 'D', 'E', 'F', 'J', 'L', 'P', 'Q', 'S', 'U', 'W', 'Z', '^', 'p', 'q', 's', 'w', '|', 'Í', 'Ï', 'Þ', 'Ø', 'ö', 'å', 'Α', 'Γ', 'Ι', 'Ξ', 'Ο', 'Ρ', 'Ω', 'γ', 'ι', 'ο', 'π', 'Д', 'Е', 'Н', 'С', 'Ф', 'Ч', 'Ш', 'Ы', 'Э', 'Ю', 'д', 'ё', 'ф', 'х', 'ы', 'ᚢ', 'ᚦ', 'ᚱ', 'ᚲ', 'ᛇ', 'ᛈ', 'ᛖ', 'ᛗ', 'ᛘ', 'ᛜ', 'ᛯ', 'ᛰ']],
-        "III": ['III', ':ᚺYhᚾLЬвRεðкΗᛉχЕAτбEЖΚΣ6чᛜαΧиÓᚨзᛁᛖ<ïΥXпνᛊøъС^ᛞξЧ9ΓÄ;ГТΟΦ7ЮIᚦШΔ>οΕδᚼΤᛚЭПPB`ᛮ!тÅβеyΩJtдpЪWш]ЗiЩ_í|wРрΠäИхᛇσ=УujаVéΘÐqψ(ΞᛋᚬáGγÁÍl#DМsНщócоΙeæцþВöмåKÖᛦιzфйÆμ0АΒЛᚢКᚠυэoжᛒᚴО"{πθ~ХΜᚲДΑ*5Фη}\\ᚷgÞᚹCЫρЙQᛘЯ3\'&Ρ-Z.8SлᛏU2сᚱЦг/нᛯr$ΝьёOζЁΛᛃΖb[Éωᛈx)%ΨκÏT1FюvMHБ+Nу@?dmыaᛅ4nf,λφkᛰᛗᛟяØ', ['"', '#', '&', '(', '*', '+', '-', '/', '2', '@', 'A', 'C', 'D', 'E', 'K', 'L', 'P', 'R', 'S', 'T', 'V', '\\', 'd', 'j', 's', '{', 'Ï', 'Ð', 'Å', 'í', 'ï', 'ä', 'Δ', 'Ι', 'Κ', 'Ν', 'Ξ', 'Ο', 'Ρ', 'Τ', 'Φ', 'Χ', 'Ψ', 'γ', 'ε', 'χ', 'Г', 'И', 'Й', 'П', 'Р', 'Ф', 'Ш', 'Ъ', 'Ю', 'Я', 'в', 'е', 'ж', 'и', 'л', 'о', 'у', 'ф', 'ш', 'ю', 'я', 'ᚢ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚼ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛘ', 'ᛦ', 'ᛯ']],
+        "I": ["I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q", "F", "K", "O", "A"]],  # Q = 17
+        "II": ["II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E", "H", "N", "R"]],  # E = 05
+        "III": ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V", "Y", "D", "J"]],  # V = 22
+        # "I": ['I', 'Ζ<хВгχR=|йÏqdmAφ[Τ&νЖ"ρåпÖАᛦVᛯᚱaδ+,лМᚾοᛒLíMElZΜfΦᛗgeСxᛊБtsTDЗᛏᚦя\\YiυУΧЁvу>ᛜGРᚴФ]äÄЪ6НUИ_ÅbÉᚠΚΑτᛮᚬNΔᛇïΞλΠΟᛉ(ΙЭÞι`KΣ\'ΓЫоSη:)здЧиPᛅQn#μJáᚲκквюышcᛁ0CαЮГþθzo9r2jᛈyξмᛰΘёчᚺХ4O$σКζэóбhΝÓHᛃ53ÐфωрᚢIγЦᛖ@FЙ;Ηц/*аᛚΩð7ъЕО~1ΛЛᛘpтψ{Д.ᛋBᛞWн}ÁuÆᚹæΒ8еᚨᛟΡТж%π-Ε?ЬØøьЩᚼщΨᚷсöÍ!ΥXβШεПékw^Я', ['!', '#', '%', ',', '/', '1', '2', '6', '9', 'A', 'F', 'L', 'M', 'N', 'U', 'Y', '[', '^', '`', 'a', 'e', 'w', 'É', 'Ó', 'Þ', 'Æ', 'Å', 'í', 'ï', 'æ', 'ø', 'ö', 'Α', 'Ζ', 'Η', 'Θ', 'Λ', 'Σ', 'Χ', 'Ψ', 'ι', 'κ', 'λ', 'μ', 'ξ', 'ο', 'ρ', 'υ', 'А', 'Г', 'Е', 'К', 'М', 'Н', 'Ф', 'Ц', 'Ь', 'Ю', 'Я', 'в', 'г', 'д', 'з', 'й', 'н', 'с', 'у', 'х', 'ч', 'ш', 'ъ', 'я', 'ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚲ', 'ᚺ', 'ᛁ', 'ᛃ', 'ᛅ', 'ᛈ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛗ', 'ᛘ', 'ᛟ', 'ᛦ']],
+        # "II": ['II', 'Pцо1rsЧÍΝUуGΓ/cσ"ᛞþᛋmψðεV2ᛜC$n0ΤLΦNъыЙкυÉФÁΥγxwf&åR{u(иαЮIÅΩeκМЬᚲØθс-d6ᛦ#.яAiFСΛᚹDᛯК3Щюοх5ζX+7WΠᛇеᛖЫδφΣᚠ]УмqᚼΧ9ÄHZчшτΞhᛘΡïᛉgᛰ)В^ᛮЭΔЖlχщфΖj<ÞᚨЗπ_%ЯНИрΘ*эᚺΚΟY~Рёpᛈ[νᚦ}ᚷztωжтпΑᛃΨбЪᛚBБÆ\'лμГ!ᚾ=æJ\\ιákTᚢéгᛗEΒᛏξзᚴЁДÓвОλÏ>KдρbХПΜ`ÖvηóᛟΙаOayᛒ4ᛅ8ШM,;нβЕьΗА@ЦᛊQᚬÐ|:SΕøoäöᚱйᛁЛ?íТ', ['"', '$', '&', '0', '4', '6', '9', '=', '@', 'B', 'D', 'E', 'F', 'J', 'L', 'P', 'Q', 'S', 'U', 'W', 'Z', '^', 'p', 'q', 's', 'w', '|', 'Í', 'Ï', 'Þ', 'Ø', 'ö', 'å', 'Α', 'Γ', 'Ι', 'Ξ', 'Ο', 'Ρ', 'Ω', 'γ', 'ι', 'ο', 'π', 'Д', 'Е', 'Н', 'С', 'Ф', 'Ч', 'Ш', 'Ы', 'Э', 'Ю', 'д', 'ё', 'ф', 'х', 'ы', 'ᚢ', 'ᚦ', 'ᚱ', 'ᚲ', 'ᛇ', 'ᛈ', 'ᛖ', 'ᛗ', 'ᛘ', 'ᛜ', 'ᛯ', 'ᛰ']],
+        # "III": ['III', ':ᚺYhᚾLЬвRεðкΗᛉχЕAτбEЖΚΣ6чᛜαΧиÓᚨзᛁᛖ<ïΥXпνᛊøъС^ᛞξЧ9ΓÄ;ГТΟΦ7ЮIᚦШΔ>οΕδᚼΤᛚЭПPB`ᛮ!тÅβеyΩJtдpЪWш]ЗiЩ_í|wРрΠäИхᛇσ=УujаVéΘÐqψ(ΞᛋᚬáGγÁÍl#DМsНщócоΙeæцþВöмåKÖᛦιzфйÆμ0АΒЛᚢКᚠυэoжᛒᚴО"{πθ~ХΜᚲДΑ*5Фη}\\ᚷgÞᚹCЫρЙQᛘЯ3\'&Ρ-Z.8SлᛏU2сᚱЦг/нᛯr$ΝьёOζЁΛᛃΖb[Éωᛈx)%ΨκÏT1FюvMHБ+Nу@?dmыaᛅ4nf,λφkᛰᛗᛟяØ', ['"', '#', '&', '(', '*', '+', '-', '/', '2', '@', 'A', 'C', 'D', 'E', 'K', 'L', 'P', 'R', 'S', 'T', 'V', '\\', 'd', 'j', 's', '{', 'Ï', 'Ð', 'Å', 'í', 'ï', 'ä', 'Δ', 'Ι', 'Κ', 'Ν', 'Ξ', 'Ο', 'Ρ', 'Τ', 'Φ', 'Χ', 'Ψ', 'γ', 'ε', 'χ', 'Г', 'И', 'Й', 'П', 'Р', 'Ф', 'Ш', 'Ъ', 'Ю', 'Я', 'в', 'е', 'ж', 'и', 'л', 'о', 'у', 'ф', 'ш', 'ю', 'я', 'ᚢ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚼ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛘ', 'ᛦ', 'ᛯ']],
         "IV": ["IV", "ESOVPZJAYQUIRHXLNFTGKDCMWB", ["J"]],  # J = 10
         "V": ["V", "VZBRGITYUPSDNHLXAWMJQOFECK", ["Z"]],  # Z = 26
         # Rotors VI - VIII only on Enigma M3, not on the Enigma I.
@@ -540,8 +540,8 @@ class Enigma_M3():
     _reflectors = {
         "A": ["A", "EJMZALYXVBWFCRQUONTSPIKHGD"],\
         # reflB is standard on Enigma I.
-        # "B": ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"],\
-        "B": ["B", "ᛰᛯᛮᛦᛟᛞᛜᛚᛘᛗᛖᛒᛏᛋᛊᛉᛈᛇᛅᛃᛁᚾᚼᚺᚹᚷᚴᚲᚱᚬᚨᚦᚢᚠяюэьыъщшчцхфутсрпонмлкйизжёедгвбаЯЮЭЬЫЪЩШЧЦХФУТСРПОНМЛКЙИЗЖЁЕДГВБАωψχφυτσρποξνμλκιθηζεδγβαΩΨΧΦΥΤΣΡΠΟΞΝΜΛΚΙΘΗΖΕΔΓΒΑåöøäæþóðïíéáÅÖØÄÆÞÓÐÏÍÉÁ~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543210/.-,+*)('&%$#\"!"],
+        "B": ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"],\
+        # "B": ["B", "ᛰᛯᛮᛦᛟᛞᛜᛚᛘᛗᛖᛒᛏᛋᛊᛉᛈᛇᛅᛃᛁᚾᚼᚺᚹᚷᚴᚲᚱᚬᚨᚦᚢᚠяюэьыъщшчцхфутсрпонмлкйизжёедгвбаЯЮЭЬЫЪЩШЧЦХФУТСРПОНМЛКЙИЗЖЁЕДГВБАωψχφυτσρποξνμλκιθηζεδγβαΩΨΧΦΥΤΣΡΠΟΞΝΜΛΚΙΘΗΖΕΔΓΒΑåöøäæþóðïíéáÅÖØÄÆÞÓÐÏÍÉÁ~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543210/.-,+*)('&%$#\"!"],
         # B is a simple atbash for now.
         "C": ["C", "FVPJIAOYEDRZXWGCTKUQSBNMHL"],\
     }
@@ -603,25 +603,34 @@ class Enigma_M3():
 
         # Turn rotors appropriately
         for ch in text:
+            # print(self.rotorlist)
             pos[-1] = self.rotorlist[-1].turn()
+            # print(self.rotorlist[-1]._name,
+                  # self.rotorlist[-1].get_letter(self.rotorlist[-1].get_position()))
             if pos[-1] in self.rotorlist[-1].get_notch():
                 # Treating the rightmost rotor separately
                 # because it steps for every character.
                 pos[1] = self.rotorlist[-2].turn()
+
+            for n in range(len(self.rotorlist)):
+                print(self.rotorlist[n]._name, end=" ")
+            print()
 
             for n in range(len(self.rotorlist) - 2, -1, -1):
                 # traversing the list backwards skipping the
                 # first and last items.
                 if pos[n] + 1 in self.rotorlist[n].get_notch():
                     # Double stepping (I think).
-                    # print("Double stepping")
+                    print("Double stepping")
+                    print(self.rotorlist[n]._name)
                     pos[n] = self.rotorlist[n].turn()
                     pos[n - 1] = self.rotorlist[n - 1].turn()
 
             # Print rotor positions
             if verbose:
                 for rotor in self.rotorlist:
-                    print(chr(rotor.get_position()+65), end =" ")
+                    # print(chr(rotor.get_position()+65), end =" ")
+                    print(rotor.get_letter(rotor.get_position()), end =" ")
 
             # Encipher text
             if verbose:
@@ -658,7 +667,7 @@ class Disk():
         self._wires = wires
         self._alpha_plain = self._alphabet[:]
         # self._alpha_vor = self._wires.replace("", " ").split()
-        self._alpha_vor = list(self._wires)#.replace("", " ").split()
+        self._alpha_vor = list(self._wires)  # .replace("", " ").split()
         # print(f"Disk.__init__ {type(self._alpha_vor)}")
         self._alpha_ruck = self._alphabet[:]
         self.set_ruck()
@@ -722,6 +731,10 @@ class Rotor(Disk):
     def get_position(self):
         """Return Rotor's position."""
         return (self._position + self.ring - 1) % len(self._alpha_plain)  # 26
+
+    def get_letter(self, position):
+        """Return the letter a a certain position:"""
+        return self._alphabet[position]
 
     def turn(self, n=1):
         """Turn the rotor the appropriate number of steps."""
@@ -862,7 +875,7 @@ def choose_letters():
     runes = a14
     return asciiChars + nordic + greek + russian + runes
 alphabet = choose_letters()
-
+alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 if __name__ == "__main__":
     main()
