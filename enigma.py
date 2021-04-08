@@ -70,6 +70,7 @@ class Operator():
         decrypt the message. This way, each ground setting was different
         and the new procedure avoided the security flaw of double encoded
         message settings.
+        https://en.wikipedia.org/wiki/Enigma_machine#Indicator
 
         Parameters
         ----------
@@ -523,9 +524,9 @@ class Enigma_M3():
     _rotors = {
         # rotor = ["name", "cipher alpha", [notches]]
         # "0": ["0", "ABCDEFGHIJKLMNOPQRSTUVWXYZ", [""]],
-        "I": ["I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q", "F", "K", "O", "A"]],  # Q = 17
-        "II": ["II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E", "H", "N", "R"]],  # E = 05
-        "III": ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V", "Y", "D", "J"]],  # V = 22
+        "I": ["I", "EKMFLGDQVZNTOWYHXUSPAIBRCJ", ["Q"]],  # Q = 17
+        "II": ["II", "AJDKSIRUXBLHWTMCQGZNPYFVOE", ["E"]],  # E = 05
+        "III": ["III", "BDFHJLCPRTXVZNYEIWGAKMUSQO", ["V"]],  # V = 22
         # "I": ['I', 'Ζ<хВгχR=|йÏqdmAφ[Τ&νЖ"ρåпÖАᛦVᛯᚱaδ+,лМᚾοᛒLíMElZΜfΦᛗgeСxᛊБtsTDЗᛏᚦя\\YiυУΧЁvу>ᛜGРᚴФ]äÄЪ6НUИ_ÅbÉᚠΚΑτᛮᚬNΔᛇïΞλΠΟᛉ(ΙЭÞι`KΣ\'ΓЫоSη:)здЧиPᛅQn#μJáᚲκквюышcᛁ0CαЮГþθzo9r2jᛈyξмᛰΘёчᚺХ4O$σКζэóбhΝÓHᛃ53ÐфωрᚢIγЦᛖ@FЙ;Ηц/*аᛚΩð7ъЕО~1ΛЛᛘpтψ{Д.ᛋBᛞWн}ÁuÆᚹæΒ8еᚨᛟΡТж%π-Ε?ЬØøьЩᚼщΨᚷсöÍ!ΥXβШεПékw^Я', ['!', '#', '%', ',', '/', '1', '2', '6', '9', 'A', 'F', 'L', 'M', 'N', 'U', 'Y', '[', '^', '`', 'a', 'e', 'w', 'É', 'Ó', 'Þ', 'Æ', 'Å', 'í', 'ï', 'æ', 'ø', 'ö', 'Α', 'Ζ', 'Η', 'Θ', 'Λ', 'Σ', 'Χ', 'Ψ', 'ι', 'κ', 'λ', 'μ', 'ξ', 'ο', 'ρ', 'υ', 'А', 'Г', 'Е', 'К', 'М', 'Н', 'Ф', 'Ц', 'Ь', 'Ю', 'Я', 'в', 'г', 'д', 'з', 'й', 'н', 'с', 'у', 'х', 'ч', 'ш', 'ъ', 'я', 'ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚲ', 'ᚺ', 'ᛁ', 'ᛃ', 'ᛅ', 'ᛈ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛗ', 'ᛘ', 'ᛟ', 'ᛦ']],
         # "II": ['II', 'Pцо1rsЧÍΝUуGΓ/cσ"ᛞþᛋmψðεV2ᛜC$n0ΤLΦNъыЙкυÉФÁΥγxwf&åR{u(иαЮIÅΩeκМЬᚲØθс-d6ᛦ#.яAiFСΛᚹDᛯК3Щюοх5ζX+7WΠᛇеᛖЫδφΣᚠ]УмqᚼΧ9ÄHZчшτΞhᛘΡïᛉgᛰ)В^ᛮЭΔЖlχщфΖj<ÞᚨЗπ_%ЯНИрΘ*эᚺΚΟY~Рёpᛈ[νᚦ}ᚷztωжтпΑᛃΨбЪᛚBБÆ\'лμГ!ᚾ=æJ\\ιákTᚢéгᛗEΒᛏξзᚴЁДÓвОλÏ>KдρbХПΜ`ÖvηóᛟΙаOayᛒ4ᛅ8ШM,;нβЕьΗА@ЦᛊQᚬÐ|:SΕøoäöᚱйᛁЛ?íТ', ['"', '$', '&', '0', '4', '6', '9', '=', '@', 'B', 'D', 'E', 'F', 'J', 'L', 'P', 'Q', 'S', 'U', 'W', 'Z', '^', 'p', 'q', 's', 'w', '|', 'Í', 'Ï', 'Þ', 'Ø', 'ö', 'å', 'Α', 'Γ', 'Ι', 'Ξ', 'Ο', 'Ρ', 'Ω', 'γ', 'ι', 'ο', 'π', 'Д', 'Е', 'Н', 'С', 'Ф', 'Ч', 'Ш', 'Ы', 'Э', 'Ю', 'д', 'ё', 'ф', 'х', 'ы', 'ᚢ', 'ᚦ', 'ᚱ', 'ᚲ', 'ᛇ', 'ᛈ', 'ᛖ', 'ᛗ', 'ᛘ', 'ᛜ', 'ᛯ', 'ᛰ']],
         # "III": ['III', ':ᚺYhᚾLЬвRεðкΗᛉχЕAτбEЖΚΣ6чᛜαΧиÓᚨзᛁᛖ<ïΥXпνᛊøъС^ᛞξЧ9ΓÄ;ГТΟΦ7ЮIᚦШΔ>οΕδᚼΤᛚЭПPB`ᛮ!тÅβеyΩJtдpЪWш]ЗiЩ_í|wРрΠäИхᛇσ=УujаVéΘÐqψ(ΞᛋᚬáGγÁÍl#DМsНщócоΙeæцþВöмåKÖᛦιzфйÆμ0АΒЛᚢКᚠυэoжᛒᚴО"{πθ~ХΜᚲДΑ*5Фη}\\ᚷgÞᚹCЫρЙQᛘЯ3\'&Ρ-Z.8SлᛏU2сᚱЦг/нᛯr$ΝьёOζЁΛᛃΖb[Éωᛈx)%ΨκÏT1FюvMHБ+Nу@?dmыaᛅ4nf,λφkᛰᛗᛟяØ', ['"', '#', '&', '(', '*', '+', '-', '/', '2', '@', 'A', 'C', 'D', 'E', 'K', 'L', 'P', 'R', 'S', 'T', 'V', '\\', 'd', 'j', 's', '{', 'Ï', 'Ð', 'Å', 'í', 'ï', 'ä', 'Δ', 'Ι', 'Κ', 'Ν', 'Ξ', 'Ο', 'Ρ', 'Τ', 'Φ', 'Χ', 'Ψ', 'γ', 'ε', 'χ', 'Г', 'И', 'Й', 'П', 'Р', 'Ф', 'Ш', 'Ъ', 'Ю', 'Я', 'в', 'е', 'ж', 'и', 'л', 'о', 'у', 'ф', 'ш', 'ю', 'я', 'ᚢ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚼ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛘ', 'ᛦ', 'ᛯ']],
@@ -606,25 +607,39 @@ class Enigma_M3():
             # print(self.rotorlist)
             pos[-1] = self.rotorlist[-1].turn()
             # print(self.rotorlist[-1]._name,
-                  # self.rotorlist[-1].get_letter(self.rotorlist[-1].get_position()))
-            if pos[-1] in self.rotorlist[-1].get_notch():
-                # Treating the rightmost rotor separately
-                # because it steps for every character.
-                pos[1] = self.rotorlist[-2].turn()
+            #       # self.rotorlist[-1].get_letter(self.rotorlist[-1].get_position()))
+            # if pos[-1] in self.rotorlist[-1].get_notch():
+            #     # Treating the rightmost rotor separately
+            #     # because it steps for every character.
+            #     print("Step pos[-2]")
+            #     pos[-2] = self.rotorlist[-2].turn()
 
-            for n in range(len(self.rotorlist)):
-                print(self.rotorlist[n]._name, end=" ")
-            print()
+            # # for n in range(len(self.rotorlist)):
+            # #     print(self.rotorlist[n]._name, pos[n], end="   ")
+            # # print()
 
-            for n in range(len(self.rotorlist) - 2, -1, -1):
-                # traversing the list backwards skipping the
-                # first and last items.
+            # for n in range(len(self.rotorlist) - 1):
+            #     # traversing the list backwards skipping the  #no
+            #     # first and last items.  #no
+            #     if (pos[n] +1) in self.rotorlist[n].get_notch():
+            #         # Double stepping (I think).
+            #         print("Double stepping")
+            #         print(self.rotorlist[n]._name)
+            #         pos[n] = self.rotorlist[n].turn()
+            #         pos[n - 1] = self.rotorlist[n - 1].turn()
+
+            for n in range(1, len(self.rotorlist) - 1):
+                # print(n)
+                # For all rotors, exept the first and last
                 if pos[n] + 1 in self.rotorlist[n].get_notch():
-                    # Double stepping (I think).
-                    print("Double stepping")
-                    print(self.rotorlist[n]._name)
+                    # Rotor is in notch position
+                    # Turn rotor
                     pos[n] = self.rotorlist[n].turn()
-                    pos[n - 1] = self.rotorlist[n - 1].turn()
+                    # Turn rotor to the left
+                    pos[n - 1] = self.rotorlist[n -1].turn()
+            # Treat right rotor separately
+            if pos[len(self.rotorlist) - 1] in self.rotorlist[len(self.rotorlist) - 1].get_notch():
+                    pos[len(self.rotorlist) - 2] = self.rotorlist[len(self.rotorlist) - 2].turn()
 
             # Print rotor positions
             if verbose:
