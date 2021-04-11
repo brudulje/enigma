@@ -15,7 +15,7 @@ def main():
     recipient = "ABC"
     sender = "QRSTU"
     # message = "Skal vi se da funker det Jeg vil ha mer"#.upper()
-    message = "ABC QRSTU 1536 = 35 = ]16 v9o ['EKN -YSR; 1D8@s g'>{b a\ZcK Za9O[ Oj@Vm"
+    message = "ABC QRSTU 1557 = 35 = T_W uvX ~IEKN Å9æcq G`7L, íe}.j Óø+P{ 5`:FQ ,/G7Ó"
     # encipher = True
     encipher = False
     date = None
@@ -309,7 +309,7 @@ class Operator():
     def get_key_from_date(self, date):
         """Return daykey of given day."""
         keyfilename = "enigmaSchlussel" + str(date)[:7] + ".txt"
-        with open(keyfilename, "r") as infile:
+        with open(keyfilename, "r", encoding="utf-8") as infile:
             for line in infile:
                 if re.search(str(date)[-2:], line[:6]):
                     return Key(line)
@@ -317,7 +317,7 @@ class Operator():
     def get_key_from_kenngruppe(self, day, kenn):
         """Return daykey of given kenngruppe."""
         keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
-        with open(keyfilename, "r") as infile:
+        with open(keyfilename, "r", encoding="utf-8") as infile:
             for line in infile:
                 if re.search(str(kenn), line):
                     # Correct the date to show the date on which
@@ -540,14 +540,20 @@ class Enigma_M3():
         'XI': ['XI', 'fk0B75At}-;M\\4/ZJN3?WXTUbR(oDE~^|\'Vs`PF_ezrvG]Sadh[lIKgYO@$i+<L1,8#{!p"jwCn=:6q%u2).m>*c9yxQ&H', ['!', '*', '1', '3', '4', '6', ':', ';', 'A', 'E', 'I', 'J', 'M', 'N', 'O', 'P', 'Q', 'S', 'U', '[', ']', '_', '`', 'a', 'c', 'f', 'h', 'n', 'p', 'q', 'r', 'v', '}']],
         'XII': ['XII', 'z9~2Rt|;]n/S<V}E64j1{uU*5=,M![iA:y.hPD7kaGZe$H^r#_`N@vfmo(ObFW8\'cTl"LI\\0p?qC-xY+>s3dQ%wKgBJX&)', ['+', '/', '3', '5', '8', '9', ':', ';', '<', '>', 'A', 'B', 'R', 'T', 'V', 'Y', 'Z', 'e', 'g', 'r', 'v', 'w', '~']],
         'XIII': ['XIII', 'VKMqv!l7AwU#T`"->}JX2F3%8Nygf{sIDhH\\;=:LWm.r\'Qt9~Gneb(Bu*4<PRdOk$Za,ESj+c6Y^@x&o|/_[51?)p0]zCi', ['$', "'", '(', ')', '.', '1', '2', '6', '7', '8', '?', 'A', 'E', 'J', 'O', 'V', '^', 'a', 'e', 'g', 'h', 'j', 't', 'u', 'w', '{']],
-        'XIV': ['XIV', 'IaUN)9SR"?c/0+|w5\'7ust:~^vZ\\W%Km_yf{MjV6d8H`JOk]X*e(1r2il>p!Ph$3YLDC#=gboF<,G@[BzQAEqTx-.4;n}&', ['$', '%', '(', '*', ',', '2', '5', '8', '=', '?', '@', 'A', 'B', 'H', 'I', 'K', 'N', 'P', 'R', 'W', 'c', 'j', 'k', 'm', 'r', 'u', '}', '~']]
+        'XIV': ['XIV', 'IaUN)9SR"?c/0+|w5\'7ust:~^vZ\\W%Km_yf{MjV6d8H`JOk]X*e(1r2il>p!Ph$3YLDC#=gboF<,G@[BzQAEqTx-.4;n}&', ['$', '%', '(', '*', ',', '2', '5', '8', '=', '?', '@', 'A', 'B', 'H', 'I', 'K', 'N', 'P', 'R', 'W', 'c', 'j', 'k', 'm', 'r', 'u', '}', '~']],
+    'XX': ['XX', 'GÁYzÄf)Å7QxX09[kRä\\å,`4"@J/sh>ø21íÞlÉÓá}{<jØa_MA:+5ïV;(Æ6Ec%rmDPuBÏCZTóæpbHéyNð~Fþtg$o8.-KöL|Ö!\'#&Oe3UnÍÐW=I*]^w?ivdSq', ['"', '%', '&', '(', '+', '-', '.', '/', '0', '3', '6', '7', '?', '@', 'D', 'E', 'H', 'L', 'M', 'N', 'Q', 'R', 'X', ']', 'b', 'e', 'h', 'm', 'n', 'u', 'w', 'É', 'Æ', 'Ä', 'Ø', 'Ö', 'é', 'ï', 'ó', 'ä']],
+    'XXI': ['XXI', 'N$~%6Z2ÏOäum7P(c@a_Y8wpl3U!<ðxfåíïV}eI=[qSÉK]R-ÁHþX4ÄC|D\'z;æo>Ð/r,ÓjséLb*{W)Ø0Å\\AiGF:vhÆt+#öE?Þá1.MyQ"óTø5gJ`nÍ^ÖB&d9k', ['!', '$', '%', '&', '.', '/', '2', '4', '5', '9', '>', 'E', 'L', 'M', 'P', 'R', 'T', 'Y', 'Z', ']', '`', 'b', 'i', 'j', 'o', 'q', 's', 'v', 'y', 'z', '{', '|', '}', 'Á', 'É', 'Ð', 'é', 'ï', 'ð', 'ó', 'þ', 'ä', 'ø', 'ö']],
+    'XXII': ['XXII', '->Þ"%Hkb=IZ4d[nþMÁ3O(pDÏTïæíGø~vyFKÓ:u@VÖ/)a$1Øzx,*Bh2;`s|\\Cctj?ÆgÐm0ÄPXAN]E+{iqreR!éö6U7Y^oSfÍ}5WlQwL8_<\'9á&#ÉðJóäå.Å', ['"', '%', '&', '4', ':', ';', '>', 'A', 'B', 'C', 'D', 'G', 'M', 'N', 'R', 'T', 'W', 'X', 'Y', '[', 'b', 'c', 'd', 'e', 'k', 'o', 'p', 'q', 't', 'y', 'z', 'Á', 'Ð', 'Þ', 'Å', 'ï', 'ó', 'æ', 'ø', 'ö', 'å']],
+    'XXIII': ['XXIII', '?SLP]MX`\\xQ^&T7(æB8fI-6ïÏÄÍäÅ,ÓÉÐg/v|r>#%DÁ:[=WhAjYöGZ}e_4bstzFC+!í9~0lyøÆÖþ5@1\'{Rná<.Kóðqu*dVm3åOJé;N2k$i"p)wEHÞaØUco', ['!', '&', "'", '.', '/', '2', ';', '=', '@', 'A', 'C', 'J', 'N', 'P', 'R', 'X', 'Z', '\\', ']', 'a', 'g', 'k', 'n', 'u', 'w', 'z', '}', 'Á', 'Ö', 'Å', 'á', 'ø', 'ö']],
+    'XXIV': ['XXIV', 'Þð$ÄO(,\'<ÁkØnxi2XTL*hH\\NZKl_e4[#mj`g3UÆ]ÐRæv~íÓb%d:zf0/"swéÉ&Mä6þcu=B{ÍqaDt5öP)!}JïIV@F1WøECGSó8^?Y;py>QÖ|9ÅA+oráÏ-7.å', ['"', '-', '0', '3', '4', '6', '7', '8', ';', '=', '?', '@', 'F', 'G', 'I', 'L', 'N', 'P', 'S', 'T', 'V', 'W', 'Z', '\\', '`', 'a', 'd', 'h', 'k', 'n', 't', 'v', '{', '|', 'Á', 'É', 'Ó', 'Ö', 'é', 'ð', 'ó', 'ä']],
     }
 
     _reflectors = {
         "A": ["A", "EJMZALYXVBWFCRQUONTSPIKHGD"],\
         # reflB is standard on Enigma I.
-        "B": ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"],\
-        "B": ["B", "~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543210/.-,+*)('&%$#\"!"],
+        # "B": ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"],\
+        # "B": ["B", "~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543210/.-,+*)('&%$#\"!"],
+        "B": ["B", "åöøäæþóðïíéáÅÖØÄÆÞÓÐÏÍÉÁ~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543210/.-,+*)('&%$#\"!"],
         # "B": ["B", "ᛰᛯᛮᛦᛟᛞᛜᛚᛘᛗᛖᛒᛏᛋᛊᛉᛈᛇᛅᛃᛁᚾᚼᚺᚹᚷᚴᚲᚱᚬᚨᚦᚢᚠяюэьыъщшчцхфутсрпонмлкйизжёедгвбаЯЮЭЬЫЪЩШЧЦХФУТСРПОНМЛКЙИЗЖЁЕДГВБАωψχφυτσρποξνμλκιθηζεδγβαΩΨΧΦΥΤΣΡΠΟΞΝΜΛΚΙΘΗΖΕΔΓΒΑåöøäæþóðïíéáÅÖØÄÆÞÓÐÏÍÉÁ~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543210/.-,+*)('&%$#\"!"],
         # B is a simple atbash for now.
         "C": ["C", "FVPJIAOYEDRZXWGCTKUQSBNMHL"],\
@@ -894,7 +900,7 @@ def choose_letters():
     greek = a9 + a10
     russian = a11 + a13
     runes = a14
-    return asciiChars  # + nordic + greek + russian + runes
+    return asciiChars + nordic  # + greek + russian + runes
 
 
 alphabet = choose_letters()
