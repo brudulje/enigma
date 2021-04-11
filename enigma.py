@@ -14,7 +14,7 @@ def main():
     recipient = "ABC"
     sender = "QRSTU"
     # message = "Skal_vi_se_da_funker_det?-Jeg_vil_ha_mer."#.upper()
-    message = "ABC QRSTU 1857 = 46 = Σ^сUw `eᚠᚼ. βÉEKN ᛃα6Ρg øΒᛦМR JᛒyΣш рᛖξнk RᛦСwᛁ Á.ЮφX jcμνТ ᛖ4AÆi α"
+    message = "ABC QRSTU 2143 = 46 = !ЮвØH ~ᚲξpΓ ЗЪ6X- ᚢóмᛗᛮ ÆtΦOъ `αяЙn ÞaПΚH СιnY9 ЬХβ]K йЬШВΑ NzКУ= {"
     # encipher = True
     encipher = False
     date = None
@@ -295,7 +295,7 @@ class Operator():
             # keyfilename = "enigmaSchlussel" + str(day)[:7] + ".txt"
             return self.get_key_from_date(day), str(day)
 
-        elif re.match("[A-Z]{3}", label):
+        elif re.match("[\S]{3}", label):
             # Label is a kenngruppe.
             if month is None:
                 # Assuming current month
