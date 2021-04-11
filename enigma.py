@@ -14,10 +14,10 @@ def main():
     """Execute enigma program."""
     recipient = "ABC"
     sender = "QRSTU"
-    message = "Skal vi se da funker det Jeg vil ha mer".upper()
-    # message = "ABC QRSTU 2026 = 35 = X9Β ᚹØᛞ ØᚢUKM ᛋΞᛯZΝ Ð8сΖᛰ RДнᛯΓ gᚷᚦΚᚠ /Оo{Í ᚲÓ7Y~"
-    encipher = True
-    # encipher = False
+    # message = "Skal vi se da funker det Jeg vil ha mer"#.upper()
+    message = "ABC QRSTU 1536 = 35 = ]16 v9o ['EKN -YSR; 1D8@s g'>{b a\ZcK Za9O[ Oj@Vm"
+    # encipher = True
+    encipher = False
     date = None
     month = None
     verbose = True  # For debugging
@@ -536,12 +536,18 @@ class Enigma_M3():
         "VI": ["VI", "JPGVOUMFYQBENHZRDKASXLICTW", ["Z", "M"]],  # Z=26, M=13
         "VII": ["VII", "NZJHGRCXMYSWBOUFAIVLPEKQDT", ["Z", "M"]],
         "VIII": ["VIII", "FKQHTLXOCBJSPDZRAMEWNIUYGV", ["Z", "M"]],
+        'X': ['X', 'ZLC\\7dqQ{0,-Spo]K`c+9<8[:?~!"li}*3bts4>6z1XB&#Vw(hOu/Y;rHReAD@\'E)JGfIv|mnN$.5%W_UkMajT^=Fy2xgP', ['"', '&', "'", '/', '7', '9', ';', '>', 'E', 'M', 'S', 'T', 'W', 'X', '\\', 'a', 'b', 'c', 'f', 'k', 'n', 'q', 'v', 'z', '{', '|']],
+        'XI': ['XI', 'fk0B75At}-;M\\4/ZJN3?WXTUbR(oDE~^|\'Vs`PF_ezrvG]Sadh[lIKgYO@$i+<L1,8#{!p"jwCn=:6q%u2).m>*c9yxQ&H', ['!', '*', '1', '3', '4', '6', ':', ';', 'A', 'E', 'I', 'J', 'M', 'N', 'O', 'P', 'Q', 'S', 'U', '[', ']', '_', '`', 'a', 'c', 'f', 'h', 'n', 'p', 'q', 'r', 'v', '}']],
+        'XII': ['XII', 'z9~2Rt|;]n/S<V}E64j1{uU*5=,M![iA:y.hPD7kaGZe$H^r#_`N@vfmo(ObFW8\'cTl"LI\\0p?qC-xY+>s3dQ%wKgBJX&)', ['+', '/', '3', '5', '8', '9', ':', ';', '<', '>', 'A', 'B', 'R', 'T', 'V', 'Y', 'Z', 'e', 'g', 'r', 'v', 'w', '~']],
+        'XIII': ['XIII', 'VKMqv!l7AwU#T`"->}JX2F3%8Nygf{sIDhH\\;=:LWm.r\'Qt9~Gneb(Bu*4<PRdOk$Za,ESj+c6Y^@x&o|/_[51?)p0]zCi', ['$', "'", '(', ')', '.', '1', '2', '6', '7', '8', '?', 'A', 'E', 'J', 'O', 'V', '^', 'a', 'e', 'g', 'h', 'j', 't', 'u', 'w', '{']],
+        'XIV': ['XIV', 'IaUN)9SR"?c/0+|w5\'7ust:~^vZ\\W%Km_yf{MjV6d8H`JOk]X*e(1r2il>p!Ph$3YLDC#=gboF<,G@[BzQAEqTx-.4;n}&', ['$', '%', '(', '*', ',', '2', '5', '8', '=', '?', '@', 'A', 'B', 'H', 'I', 'K', 'N', 'P', 'R', 'W', 'c', 'j', 'k', 'm', 'r', 'u', '}', '~']]
     }
 
     _reflectors = {
         "A": ["A", "EJMZALYXVBWFCRQUONTSPIKHGD"],\
         # reflB is standard on Enigma I.
         "B": ["B", "YRUHQSLDPXNGOKMIEBFZCWVJAT"],\
+        "B": ["B", "~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543210/.-,+*)('&%$#\"!"],
         # "B": ["B", "ᛰᛯᛮᛦᛟᛞᛜᛚᛘᛗᛖᛒᛏᛋᛊᛉᛈᛇᛅᛃᛁᚾᚼᚺᚹᚷᚴᚲᚱᚬᚨᚦᚢᚠяюэьыъщшчцхфутсрпонмлкйизжёедгвбаЯЮЭЬЫЪЩШЧЦХФУТСРПОНМЛКЙИЗЖЁЕДГВБАωψχφυτσρποξνμλκιθηζεδγβαΩΨΧΦΥΤΣΡΠΟΞΝΜΛΚΙΘΗΖΕΔΓΒΑåöøäæþóðïíéáÅÖØÄÆÞÓÐÏÍÉÁ~}|{zyxwvutsrqponmlkjihgfedcba`_^]\[ZYXWVUTSRQPONMLKJIHGFEDCBA@?>=<;:9876543210/.-,+*)('&%$#\"!"],
         # B is a simple atbash for now.
         "C": ["C", "FVPJIAOYEDRZXWGCTKUQSBNMHL"],\
@@ -867,9 +873,9 @@ class Plugboard():
 
 
 def choose_letters():
-    a0 = "!\"#$%&'()*+,-./0123456789:;<=>?@"
-    a3 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`"
-    a5 = "abcdefghijklmnopqrstuvwxyz{|}~"
+    a0 = "!\"#$%&'()*+,-./0123456789:;<=>?"
+    a3 = "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_"
+    a5 = "`abcdefghijklmnopqrstuvwxyz{|}~"
 
     a7 = "\u00c1\u00c9\u00cd\u00cf\u00d0\u00d3\u00deÆÄØÖÅ\u00e1\u00e9\u00ed\u00ef\u00f0\u00f3\u00feæäøöå"
 
@@ -888,9 +894,11 @@ def choose_letters():
     greek = a9 + a10
     russian = a11 + a13
     runes = a14
-    return asciiChars + nordic + greek + russian + runes
+    return asciiChars  # + nordic + greek + russian + runes
+
+
 alphabet = choose_letters()
-alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+# alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 if __name__ == "__main__":
     main()
