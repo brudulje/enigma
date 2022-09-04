@@ -76,3 +76,7 @@ generate a month worth of daykeys for the Enigma_M3.
 This version adds the possibility to specify which day's daykey
 to use when encrypting by passing the `date` keyword to
 `Operator.encipher`.
+
+### v2.3
+
+Adding license file to specify GNU GPL v3 license.
